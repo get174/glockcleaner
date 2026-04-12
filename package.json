@@ -1,0 +1,45 @@
+{
+  "name": "glockcleaner",
+  "version": "1.1.0",
+  "description": "Application de nettoyage PC pour Windows - Version améliorée",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "electron-builder",
+    "dist": "electron-builder --publish=never",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "keywords": ["electron", "cleanup", "windows", "optimizer"],
+  "author": "Glok Team",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^41.0.1",
+    "electron-builder": "^24.13.3"
+  },
+  "dependencies": {
+    "fs-extra": "^11.3.4"
+  },
+  "build": {
+    "appId": "com.glokcleaner.app",
+    "productName": "GLOK CLEANER",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "**/*",
+      "!dist/**/*",
+      "!node_modules/**/*"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}
+
