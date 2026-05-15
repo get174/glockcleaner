@@ -28,7 +28,7 @@ const mockData = {
   about: {
     title: 'À Propos',
     version: 'v1.2.0',
-    credits: 'Glok Team 2024',
+    credits: 'Glock Team 2025',
     license: 'ISC'
   }
 };

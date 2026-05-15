@@ -272,7 +272,7 @@ const modeTemplates = {
         </div>
         <div style="border-top: 1px solid var(--border-color); padding-top: 20px; margin-top: 20px;">
           <div style="font-weight: 600; margin-bottom: 10px;">Version de l\'Application</div>
-          <div style="color: var(--text-secondary); font-size: 0.9em;">GLOK CLEANER v1.2.0</div>
+          <div style="color: var(--text-secondary); font-size: 0.9em;">GLOCK CLEANER v1.2.0</div>
         </div>
       </div>
     </div>
@@ -284,19 +284,19 @@ const modeTemplates = {
       </div>
       <div class="section-items" style="padding: 30px; text-align: center;">
         <div style="font-size: 3em; margin-bottom: 15px;">⚡</div>
-        <div style="font-size: 1.8em; font-weight: 700; margin-bottom: 5px; color: var(--accent-color);">GLOK CLEANER</div>
+        <div style="font-size: 1.8em; font-weight: 700; margin-bottom: 5px; color: var(--accent-color);">GLOCK CLEANER</div>
         <div style="color: var(--text-secondary); margin-bottom: 30px;">Nettoyage Professionnel de Votre PC</div>
         
         <div style="background: rgba(30, 144, 255, 0.1); padding: 20px; border-radius: 8px; margin-bottom: 20px; text-align: left;">
           <div style="margin-bottom: 10px;"><strong>Version:</strong> v1.2.0</div>
           <div style="margin-bottom: 10px;"><strong>Date:</strong> Avril 2026</div>
           <div style="margin-bottom: 10px;"><strong>Licence:</strong> ISC</div>
-          <div><strong>Équipe:</strong> GLOK Development Team</div>
+          <div><strong>Équipe:</strong> GLOCK Development Team</div>
         </div>
         
         <div style="border-top: 1px solid var(--border-color); padding-top: 20px;">
           <p style="color: var(--text-secondary); font-size: 0.9em; margin-bottom: 15px;">
-            GLOK CLEANER est une application complète de nettoyage et d'optimisation système pour Windows.
+            GLOCK CLEANER est une application complète de nettoyage et d'optimisation système pour Windows.
           </p>
           <div style="display: flex; gap: 10px; justify-content: center;">
             <button class="btn btn-secondary" onclick="alert('Site Web')" style="padding: 8px 16px; font-size: 0.8em;">🌐 Site Web</button>
@@ -430,7 +430,7 @@ window.scanDuplicates = () => {
 
 // Init on DOM load
 document.addEventListener('DOMContentLoaded', async () => {
-  addLog('GLOK CLEANER initialisé', 'info');
+  addLog('GLOCK CLEANER initialisé', 'info');
   
   try {
     // Load disk info

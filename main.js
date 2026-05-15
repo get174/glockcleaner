@@ -53,10 +53,22 @@ function getPathsForCategories(categories) {
     thumbnails: config.cleaningPaths.slice(6,7),
     // etc.
   };
+
+  const requestedCategories = Array.isArray(categories) ? categories : [];
+  const availableCategories = Object.keys(pathMap);
+
+  // ✅ Si "all" est demandé (ou aucune catégorie valide), nettoyer toutes les catégories connues
+  const normalizedCategories = requestedCategories.includes('all')
+    ? availableCategories
+    : requestedCategories.filter(cat => availableCategories.includes(cat));
+
+  const effectiveCategories = normalizedCategories.length > 0 ? normalizedCategories : availableCategories;
+
   const paths = new Set();
-  categories.forEach(cat => {
+  effectiveCategories.forEach(cat => {
     (pathMap[cat] || []).forEach(p => paths.add(p));
   });
+
   return Array.from(paths).filter(fs.existsSync);
 }
 
