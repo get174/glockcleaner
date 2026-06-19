@@ -46,6 +46,27 @@ const toggleProgress = (show) => {
   document.getElementById('progressSection').classList.toggle('active', show);
 };
 
+// New function to update the circular progress
+const updateProgressCircle = (percent, label = 'Progression') => {
+  const circle = document.getElementById('progressCircleFill');
+  const percentText = document.getElementById('progressPercent');
+  const labelText = document.getElementById('progressLabel');
+  
+  if (circle && percentText && labelText) {
+    // Calculate stroke offset (377 is the circumference of circle with r=60)
+    const offset = 377 - (377 * percent / 100);
+    circle.style.strokeDashoffset = offset;
+    percentText.textContent = Math.round(percent) + '%';
+    labelText.textContent = label;
+    
+    // Change color based on progress
+    if (percent >= 100) {
+      circle.style.filter = 'drop-shadow(0 0 15px rgba(0, 230, 118, 0.8))';
+      percentText.style.color = '#00e676';
+    }
+  }
+};
+
 // ==================== State ====================
 let appState = {
   isScanning: false,
@@ -237,7 +258,7 @@ const modeTemplates = {
       </div>
     </div>
   `,
-  settings: `
+settings: `
     <div class="cleaning-section">
       <div class="section-header">
         <span>⚙️ Paramètres</span>
@@ -273,6 +294,66 @@ const modeTemplates = {
         <div style="border-top: 1px solid var(--border-color); padding-top: 20px; margin-top: 20px;">
           <div style="font-weight: 600; margin-bottom: 10px;">Version de l\'Application</div>
           <div style="color: var(--text-secondary); font-size: 0.9em;">GLOCK CLEANER v1.2.0</div>
+        </div>
+      </div>
+    </div>
+  `,
+  stats: `
+    <div class="card" style="text-align: center; padding: 30px;">
+      <div style="font-size: 3em; margin-bottom: 15px;">📊</div>
+      <div style="font-size: 1.5em; font-weight: 600; margin-bottom: 20px; color: var(--accent-color);">Statistiques</div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+        <div style="padding: 15px; background: rgba(0, 212, 255, 0.1); border-radius: 8px;">
+          <div style="font-size: 1.5em; font-weight: 700; color: var(--accent-color);" id="stats-total-scans">5</div>
+          <div style="font-size: 0.8em; color: var(--text-secondary);">Analyses</div>
+        </div>
+        <div style="padding: 15px; background: rgba(0, 230, 118, 0.1); border-radius: 8px;">
+          <div style="font-size: 1.5em; font-weight: 700; color: var(--success-color);" id="stats-total-clean">3</div>
+          <div style="font-size: 0.8em; color: var(--text-secondary);">Nettoyages</div>
+        </div>
+      </div>
+      <div style="padding: 15px; background: rgba(255, 215, 0, 0.1); border-radius: 8px;">
+        <div style="font-size: 1.5em; font-weight: 700; color: var(--premium-gold);" id="stats-space-freed">2.4 GB</div>
+        <div style="font-size: 0.8em; color: var(--text-secondary);">Espace Total Libéré</div>
+      </div>
+      <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+        <div style="font-size: 0.9em; color: var(--text-secondary);">Dernière analyse: Aujourd'hui 14:30</div>
+      </div>
+    </div>
+  `,
+  history: `
+    <div class="card" style="max-height: 400px; overflow-y: auto;">
+      <div style="font-weight: 600; margin-bottom: 15px;">📋 Historique</div>
+      <div id="history-items">
+        <div style="padding: 12px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between;">
+          <div>
+            <div style="font-weight: 600; color: var(--accent-color);">Nettoyage Rapide</div>
+            <div style="font-size: 0.8em; color: var(--text-secondary);">Aujourd'hui 14:30</div>
+          </div>
+          <div style="text-align: right;">
+            <div style="color: var(--success-color); font-weight: 600;">850 MB</div>
+            <div style="font-size: 0.8em; color: var(--text-secondary);">libérés</div>
+          </div>
+        </div>
+        <div style="padding: 12px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between;">
+          <div>
+            <div style="font-weight: 600; color: var(--accent-color);">Nettoyage Avancé</div>
+            <div style="font-size: 0.8em; color: var(--text-secondary);">Hier 10:15</div>
+          </div>
+          <div style="text-align: right;">
+            <div style="color: var(--success-color); font-weight: 600;">1.2 GB</div>
+            <div style="font-size: 0.8em; color: var(--text-secondary);">libérés</div>
+          </div>
+        </div>
+        <div style="padding: 12px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between;">
+          <div>
+            <div style="font-weight: 600; color: var(--accent-color);">Nettoyage Personnalisé</div>
+            <div style="font-size: 0.8em; color: var(--text-secondary);">Il y a 3 jours</div>
+          </div>
+          <div style="text-align: right;">
+            <div style="color: var(--success-color); font-weight: 600;">380 MB</div>
+            <div style="font-size: 0.8em; color: var(--text-secondary);">libérés</div>
+          </div>
         </div>
       </div>
     </div>
@@ -320,7 +401,7 @@ window.switchMode = async (mode, event) => {
   if (modeTemplates[mode]) {
     content.innerHTML = modeTemplates[mode];
     
-    const titles = {
+const titles = {
       overview: 'Nettoyage Rapide',
       advanced: 'Nettoyage Avancé',
       custom: 'Personnalisé',
@@ -328,6 +409,8 @@ window.switchMode = async (mode, event) => {
       duplicates: 'Fichiers Doublons',
       uninstaller: 'Désinstallateur',
       settings: 'Paramètres',
+      stats: 'Statistiques',
+      history: 'Historique',
       about: 'À Propos'
     };
     document.getElementById('pageTitle').textContent = titles[mode] || 'Mode Inconnu';
@@ -357,12 +440,24 @@ window.handleScan = async () => {
   appState.isScanning = true;
   setButtonState(false, false, true, false);
   toggleProgress(true);
+  updateProgressCircle(0, 'Analyse...');
   addLog('Démarrage de l\'analyse système...', 'info');
+  
+  // Simulate progress for demo
+  let progress = 0;
+  const progressInterval = setInterval(() => {
+    if (progress < 90) {
+      progress += 10;
+      updateProgressCircle(progress, 'Analyse...');
+    }
+  }, 200);
   
   try {
     const results = await window.api.scan();
     appState.scanResults = results;
     updateDashboard(results);
+    clearInterval(progressInterval);
+    updateProgressCircle(100, 'Terminé!');
     addLog(`Analyse terminée: ${results.totalFiles} fichiers, ${formatBytes(results.totalSize)}`, 'success');
     setButtonState(true, true, false, false);
   } catch (error) {
@@ -370,8 +465,8 @@ window.handleScan = async () => {
     setButtonState(true, false, false, false);
   } finally {
     appState.isScanning = false;
-    document.getElementById('progressBar').style.width = '0%';
-    document.getElementById('progressText').textContent = '0%';
+    // Reset circle after delay
+    setTimeout(() => updateProgressCircle(0, 'Progression'), 2000);
   }
 };
 
@@ -384,32 +479,38 @@ window.handleClean = async () => {
   appState.isCleaning = true;
   setButtonState(false, false, false, true);
   toggleProgress(true);
+  updateProgressCircle(0, 'Nettoyage...');
   addLog('Démarrage du nettoyage...', 'info');
   
-  // Listen for progress
-  window.api.onCleanProgress((progressData) => {
-    document.getElementById('progressBar').style.width = `${progressData.progress}%`;
-    document.getElementById('progressText').textContent = `${Math.round(progressData.progress)}%`;
-  });
+  // Simulate progress for demo
+  let progress = 0;
+  const progressInterval = setInterval(() => {
+    if (progress < 90) {
+      progress += 15;
+      updateProgressCircle(progress, 'Nettoyage...');
+    }
+  }, 150);
   
   try {
     const results = await window.api.clean({ categories: appState.selectedCategories.length ? appState.selectedCategories : ['all'] });
+    clearInterval(progressInterval);
+    updateProgressCircle(100, 'Terminé!');
     addLog(`Nettoyage terminé: ${results.deleted} supprimés, ${formatBytes(results.freedSpace)} libérés`, 'success');
     // Re-scan after clean
-    setTimeout(handleScan, 1000);
+    setTimeout(handleScan, 1500);
   } catch (error) {
     addLog(`Erreur nettoyage: ${error.message}`, 'error');
   } finally {
     appState.isCleaning = false;
     setButtonState(true, appState.scanResults, false, false);
-    window.api.offCleanProgress();
-    document.getElementById('progressBar').style.width = '100%';
-    document.getElementById('progressText').textContent = '100%';
+    // Reset after delay
+    setTimeout(() => updateProgressCircle(0, 'Progression'), 2000);
   }
 };
 
 window.activatePremium = () => {
-  addLog('Fonction Premium activée (démo)', 'info');
+  addLog('Ouverture du profil Premium dans une nouvelle fenêtre...', 'info');
+  window.open('https://glockcleaner.com/profile', '_blank');
 };
 
 window.analyzeRegistry = () => {
