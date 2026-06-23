@@ -179,10 +179,809 @@
     .content-area {
       flex: 1;
       display: grid;
-      grid-template-columns: 2fr 1fr;
+      grid-template-columns: repeat(4, 1fr);
       gap: 20px;
       padding: 30px;
       overflow-y: auto;
+    }
+
+    /* ==================== Stats Cards with Circular Progress ==================== */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: linear-gradient(145deg, var(--secondary-color), #1e2a3d);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--accent-gradient);
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0, 212, 255, 0.15);
+    }
+
+    .stat-ring {
+      position: relative;
+      width: 100px;
+      height: 100px;
+      margin-bottom: 15px;
+    }
+
+    .stat-ring svg {
+      transform: rotate(-90deg);
+      width: 100%;
+      height: 100%;
+    }
+
+    .stat-ring-bg {
+      fill: none;
+      stroke: var(--primary-color);
+      stroke-width: 8;
+    }
+
+    .stat-ring-fill {
+      fill: none;
+      stroke: var(--accent-color);
+      stroke-width: 8;
+      stroke-linecap: round;
+      stroke-dasharray: 251;
+      stroke-dashoffset: 251;
+      transition: stroke-dashoffset 1s ease;
+    }
+
+    .stat-ring-fill.success { stroke: var(--success-color); }
+    .stat-ring-fill.warning { stroke: var(--warning-color); }
+    .stat-ring-fill.premium { stroke: var(--premium-gold); }
+
+    .stat-ring-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+
+    .stat-ring-value {
+      font-size: 1.4em;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .stat-ring-label {
+      font-size: 0.65em;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stat-icon {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      font-size: 1.2em;
+      opacity: 0.6;
+    }
+
+    .stat-title {
+      font-size: 0.9em;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 5px;
+    }
+
+    .stat-subtitle {
+      font-size: 0.75em;
+      color: var(--text-secondary);
+    }
+
+    .stat-value {
+      font-size: 1.8em;
+      font-weight: 700;
+      color: var(--accent-color);
+      margin: 10px 0 5px;
+    }
+
+    .stat-bar {
+      width: 100%;
+      height: 4px;
+      background: var(--primary-color);
+      border-radius: 2px;
+      margin-top: 10px;
+      overflow: hidden;
+    }
+
+    .stat-bar-fill {
+      height: 100%;
+      background: var(--accent-gradient);
+      border-radius: 2px;
+      transition: width 0.5s ease;
+    }
+
+    /* ==================== Dashboard Cards Row ==================== */
+    .dashboard-row {
+      grid-column: span 4;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .dashboard-card {
+      background: linear-gradient(145deg, var(--secondary-color), #1e2a3d);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .dashboard-card:hover {
+      border-color: rgba(0, 212, 255, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .dashboard-card-title {
+      font-size: 0.8em;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dashboard-card-value {
+      font-size: 2em;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 5px;
+    }
+
+    .dashboard-card-subvalue {
+      font-size: 0.85em;
+      color: var(--text-secondary);
+    }
+
+    .dashboard-card-icon {
+      font-size: 2em;
+      margin-bottom: 10px;
+    }
+
+    /* ==================== Grid Areas ==================== */
+    .left-panel {
+      grid-column: span 3;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .right-panel {
+      grid-column: span 1;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* ==================== CCleaner Style Dashboard ==================== */
+    .ccleaner-style {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 20px;
+      background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+    }
+
+    .pc-status {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .status-icon {
+      font-size: 1.5em;
+    }
+
+    .status-label {
+      color: var(--text-secondary);
+      font-size: 0.9em;
+    }
+
+    .status-value {
+      font-weight: 700;
+      font-size: 1em;
+    }
+
+    .status-value.good {
+      color: var(--success-color);
+    }
+
+    .status-value.warning {
+      color: var(--warning-color);
+    }
+
+    .status-value.bad {
+      color: var(--error-color);
+    }
+
+    .header-tip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 15px;
+      background: rgba(0, 212, 255, 0.1);
+      border-radius: 20px;
+      border: 1px solid rgba(0, 212, 255, 0.2);
+    }
+
+    .tip-icon {
+      font-size: 1.1em;
+    }
+
+    .tip-text {
+      color: var(--accent-color);
+      font-size: 0.85em;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 20px;
+    }
+
+    .main-column {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .side-column {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    /* Action Cards */
+    .action-card {
+      background: linear-gradient(145deg, var(--secondary-color), #1e2a3d);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .action-card:hover {
+      border-color: rgba(0, 212, 255, 0.3);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--border-color);
+      background: linear-gradient(135deg, rgba(0, 212, 255, 0.05), transparent);
+    }
+
+    .card-icon {
+      font-size: 1.5em;
+    }
+
+    .card-title {
+      font-size: 1.1em;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .card-body {
+      padding: 20px;
+    }
+
+    .card-footer {
+      padding: 15px 20px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    /* Space Preview */
+    .space-preview {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .space-label {
+      color: var(--text-secondary);
+      font-size: 0.85em;
+      margin-bottom: 8px;
+    }
+
+    .space-value {
+      font-size: 2.5em;
+      font-weight: 800;
+      color: var(--accent-color);
+      margin-bottom: 12px;
+    }
+
+    .space-bar {
+      height: 8px;
+      background: var(--primary-color);
+      border-radius: 4px;
+      overflow: hidden;
+      max-width: 300px;
+      margin: 0 auto;
+    }
+
+    .space-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-color), var(--success-color));
+      border-radius: 4px;
+      transition: width 0.5s ease;
+    }
+
+    /* Quick Checkboxes */
+    .quick-checkboxes {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .quick-checkbox {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 15px;
+      background: var(--primary-color);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .quick-checkbox:hover {
+      background: var(--tertiary-color);
+    }
+
+    .quick-checkbox input {
+      display: none;
+    }
+
+    .checkmark {
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border-color);
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .quick-checkbox input:checked + .checkmark {
+      background: var(--accent-color);
+      border-color: var(--accent-color);
+    }
+
+    .quick-checkbox input:checked + .checkmark::after {
+      content: '✓';
+      color: var(--primary-color);
+      font-size: 0.8em;
+      font-weight: bold;
+    }
+
+    .checkbox-label {
+      flex: 1;
+      color: var(--text-primary);
+      font-size: 0.95em;
+    }
+
+    .checkbox-size {
+      color: var(--text-secondary);
+      font-size: 0.85em;
+      font-weight: 600;
+    }
+
+    /* Buttons */
+    .btn-analyze, .btn-clean {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px 28px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-analyze {
+      background: var(--accent-gradient);
+      color: var(--primary-color);
+      flex: 1;
+    }
+
+    .btn-analyze:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 212, 255, 0.4);
+    }
+
+    .btn-analyze:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .btn-clean {
+      background: linear-gradient(135deg, var(--success-color), #00b868);
+      color: var(--primary-color);
+      flex: 1;
+    }
+
+    .btn-clean:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 230, 118, 0.4);
+    }
+
+    .btn-clean:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .btn-secondary {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px 20px;
+      background: var(--tertiary-color);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      color: var(--text-primary);
+      font-size: 0.9em;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+      background: var(--primary-color);
+      border-color: var(--accent-color);
+    }
+
+    /* Clean Summary */
+    .clean-summary {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+
+    .summary-item {
+      text-align: center;
+      padding: 15px;
+      background: var(--primary-color);
+      border-radius: 10px;
+    }
+
+    .summary-label {
+      display: block;
+      color: var(--text-secondary);
+      font-size: 0.8em;
+      margin-bottom: 5px;
+    }
+
+    .summary-value {
+      font-size: 1.4em;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .summary-value.highlight {
+      color: var(--success-color);
+    }
+
+    .risk-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 15px;
+      background: rgba(0, 230, 118, 0.1);
+      border-radius: 8px;
+    }
+
+    .risk-badge {
+      font-size: 0.8em;
+      padding: 4px 10px;
+      border-radius: 15px;
+    }
+
+    .risk-badge.low {
+      background: rgba(0, 230, 118, 0.2);
+      color: var(--success-color);
+    }
+
+    .risk-info-text {
+      font-size: 0.8em;
+      color: var(--text-secondary);
+    }
+
+    /* Tools Row */
+    .tools-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+    }
+
+    .tool-card {
+      padding: 20px;
+      background: linear-gradient(145deg, var(--secondary-color), #1e2a3d);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+
+    .tool-card:hover {
+      border-color: var(--accent-color);
+      transform: translateY(-3px);
+    }
+
+    .tool-icon {
+      font-size: 1.8em;
+      margin-bottom: 10px;
+    }
+
+    .tool-title {
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 5px;
+    }
+
+    .tool-desc {
+      font-size: 0.8em;
+      color: var(--text-secondary);
+    }
+
+    /* Quick Panel */
+    .quick-panel, .stats-panel {
+      background: linear-gradient(145deg, var(--secondary-color), #1e2a3d);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .panel-title {
+      padding: 15px 20px;
+      font-weight: 600;
+      color: var(--text-primary);
+      border-bottom: 1px solid var(--border-color);
+      background: linear-gradient(135deg, rgba(0, 212, 255, 0.05), transparent);
+    }
+
+    .quick-actions-list {
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .quick-action-button {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 15px;
+      background: var(--primary-color);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9em;
+    }
+
+    .quick-action-button:hover {
+      background: var(--tertiary-color);
+      border-color: var(--accent-color);
+      transform: translateX(5px);
+    }
+
+    .qa-icon {
+      font-size: 1.2em;
+    }
+
+    /* Stats Panel */
+    .stats-list {
+      padding: 15px;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .stat-row:last-child {
+      border-bottom: none;
+    }
+
+    .stat-row.highlight {
+      background: rgba(0, 230, 118, 0.1);
+      margin: 0 -15px;
+      padding: 12px 15px;
+    }
+
+    .stat-label {
+      color: var(--text-secondary);
+      font-size: 0.85em;
+    }
+
+    .stat-value {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .stat-row.highlight .stat-value {
+      color: var(--success-color);
+    }
+
+    /* Admin Banner */
+    .admin-banner {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 15px;
+      background: linear-gradient(135deg, rgba(255, 82, 82, 0.1), rgba(255, 171, 64, 0.1));
+      border: 1px solid rgba(255, 82, 82, 0.3);
+      border-radius: 12px;
+    }
+
+    .admin-icon {
+      font-size: 1.5em;
+    }
+
+    .admin-text {
+      flex: 1;
+    }
+
+    .admin-title {
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 0.9em;
+    }
+
+    .admin-desc {
+      font-size: 0.8em;
+      color: var(--text-secondary);
+    }
+
+    .admin-btn {
+      padding: 8px 16px;
+      background: var(--error-color);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.85em;
+    }
+
+    .admin-btn:hover {
+      background: #ff7070;
+    }
+
+    /* ==================== Quick Actions ==================== */
+    .quick-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .quick-action-btn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: var(--primary-color);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.85em;
+    }
+
+    .quick-action-btn:hover {
+      background: var(--secondary-color);
+      border-color: var(--accent-color);
+      transform: translateX(4px);
+    }
+
+    .quick-action-icon {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--accent-color);
+      border-radius: 8px;
+      color: var(--bg-color);
+      font-weight: bold;
+    }
+
+    /* ==================== Categories Grid ==================== */
+    .categories-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+    }
+
+    .category-card {
+      background: var(--secondary-color);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 15px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .category-card:hover {
+      border-color: var(--accent-color);
+      transform: translateY(-3px);
+    }
+
+    .category-icon {
+      font-size: 1.8em;
+      margin-bottom: 8px;
+    }
+
+    .category-name {
+      font-size: 0.8em;
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .category-count {
+      font-size: 0.7em;
+      color: var(--text-secondary);
+      margin-top: 4px;
     }
 
     /* ==================== Dashboard Section ==================== */
@@ -546,6 +1345,67 @@
       50% { filter: drop-shadow(0 0 20px rgba(0, 212, 255, 0.8)); }
     }
 
+    /* Progress Overlay */
+    .progress-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .progress-overlay.active {
+      display: flex;
+    }
+
+    .progress-modal {
+      background: var(--secondary-color);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 40px 60px;
+      text-align: center;
+      min-width: 350px;
+      box-shadow: 0 0 60px rgba(0, 212, 255, 0.2);
+    }
+
+    .progress-header {
+      margin-bottom: 30px;
+    }
+
+    .progress-title {
+      font-size: 1.5em;
+      font-weight: 600;
+      color: var(--accent-color);
+    }
+
+    .progress-status {
+      margin-top: 25px;
+      font-size: 0.9em;
+      color: var(--text-secondary);
+    }
+
+    .btn-cancel {
+      margin-top: 25px;
+      padding: 10px 30px;
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9em;
+      transition: all 0.3s ease;
+    }
+
+    .btn-cancel:hover {
+      border-color: var(--accent-color);
+      color: var(--accent-color);
+    }
+
     /* Legacy text log styles (keeping for compatibility) */
     .logs-header {
       padding: 15px 20px;
@@ -668,9 +1528,540 @@
         max-height: 150px;
       }
     }
+
+    /* ==================== Advanced & Tools Screens ==================== */
+    .advanced-section, .health-section, .startup-section, .duplicates-section, .uninstaller-section, .settings-section, .stats-section, .history-section, .about-section {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .section-group {
+      background: linear-gradient(145deg, var(--secondary-color), #1e2a3d);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .group-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 15px 20px;
+      background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), transparent);
+      border-bottom: 1px solid var(--border-color);
+      font-weight: 600;
+    }
+
+    .group-icon {
+      font-size: 1.2em;
+    }
+
+    .group-title {
+      color: var(--text-primary);
+    }
+
+    .group-items {
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .item-checkbox {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 15px;
+      background: var(--primary-color);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .item-checkbox:hover {
+      background: var(--tertiary-color);
+    }
+
+    .item-checkbox input {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent-color);
+    }
+
+    .item-name {
+      flex: 1;
+      color: var(--text-primary);
+    }
+
+    .item-size {
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    .item-risk {
+      padding: 3px 8px;
+      border-radius: 10px;
+      font-size: 0.75em;
+    }
+
+    .item-risk.low {
+      background: rgba(0, 230, 118, 0.15);
+      color: var(--success-color);
+    }
+
+    .item-risk.medium {
+      background: rgba(255, 171, 64, 0.15);
+      color: var(--warning-color);
+    }
+
+    .item-risk.high {
+      background: rgba(255, 82, 82, 0.15);
+      color: var(--error-color);
+    }
+
+    .sticky-footer {
+      position: sticky;
+      bottom: 0;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 20px;
+      background: var(--secondary-color);
+      border-top: 1px solid var(--border-color);
+      margin: 20px -20px -20px;
+    }
+
+    .total-space {
+      flex: 1;
+      color: var(--text-secondary);
+    }
+
+    .total-space strong {
+      color: var(--success-color);
+      font-size: 1.2em;
+    }
+
+    /* Health Section */
+    .health-info-card, .startup-info, .duplicates-info, .uninstaller-info {
+      background: linear-gradient(145deg, var(--secondary-color), #1e2a3d);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 25px;
+      text-align: center;
+    }
+
+    .health-icon, .info-icon {
+      font-size: 3em;
+      margin-bottom: 15px;
+    }
+
+    .health-title, .info-title {
+      font-size: 1.5em;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .health-desc, .info-desc {
+      color: var(--text-secondary);
+    }
+
+    .health-options, .startup-list, .duplicates-folders, .duplicates-options, .uninstaller-search, .uninstaller-list, .settings-group {
+      background: linear-gradient(145deg, var(--secondary-color), #1e2a3d);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 15px;
+    }
+
+    .health-actions, .duplicates-actions, .duplicates-folders, .uninstaller-search {
+      display: flex;
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    /* Startup Section */
+    .startup-item {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 15px;
+      background: var(--primary-color);
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+
+    .startup-item input {
+      width: 20px;
+      height: 20px;
+    }
+
+    .item-details {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .item-path {
+      font-size: 0.75em;
+      color: var(--text-secondary);
+    }
+
+    .item-impact {
+      padding: 4px 10px;
+      border-radius: 10px;
+      font-size: 0.75em;
+    }
+
+    .item-impact.high {
+      background: rgba(255, 82, 82, 0.15);
+      color: var(--error-color);
+    }
+
+    .item-impact.medium {
+      background: rgba(255, 171, 64, 0.15);
+      color: var(--warning-color);
+    }
+
+    .item-impact.low {
+      background: rgba(0, 230, 118, 0.15);
+      color: var(--success-color);
+    }
+
+    .btn-toggle {
+      padding: 8px 16px;
+      background: var(--tertiary-color);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-primary);
+      cursor: pointer;
+    }
+
+    .btn-toggle:hover {
+      background: var(--accent-color);
+      color: var(--primary-color);
+    }
+
+    /* Duplicates Section */
+    .folder-select {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .folder-select input {
+      flex: 1;
+      padding: 12px 15px;
+      background: var(--primary-color);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-primary);
+    }
+
+    .btn-browse, .btn-add-folder {
+      padding: 12px 20px;
+      background: var(--tertiary-color);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-primary);
+      cursor: pointer;
+    }
+
+    .folder-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .folder-item {
+      padding: 8px 15px;
+      background: rgba(0, 212, 255, 0.1);
+      border: 1px solid var(--accent-color);
+      border-radius: 20px;
+      font-size: 0.85em;
+    }
+
+    .btn-remove {
+      margin-left: 8px;
+      background: none;
+      border: none;
+      color: var(--error-color);
+      cursor: pointer;
+      font-size: 1.1em;
+    }
+
+    /* Uninstaller Section */
+    .uninstaller-list {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .app-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px;
+      background: var(--primary-color);
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+
+    .app-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .app-name {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .app-size, .app-date {
+      font-size: 0.8em;
+      color: var(--text-secondary);
+    }
+
+    .btn-uninstall, .btn-open {
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .btn-uninstall {
+      background: rgba(255, 82, 82, 0.15);
+      border: 1px solid var(--error-color);
+      color: var(--error-color);
+    }
+
+    .btn-open {
+      background: var(--tertiary-color);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+    }
+
+    /* Settings Section */
+    .settings-group {
+      padding: 0;
+    }
+
+    .settings-group .group-title {
+      padding: 15px 20px;
+      background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), transparent);
+      border-bottom: 1px solid var(--border-color);
+      font-weight: 600;
+    }
+
+    .setting-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 20px;
+      border-bottom: 1px solid var(--border-color);
+      cursor: pointer;
+    }
+
+    .setting-item:last-child {
+      border-bottom: none;
+    }
+
+    .setting-item input {
+      width: 45px;
+      height: 24px;
+      accent-color: var(--accent-color);
+    }
+
+    /* Stats Section */
+    .stats-overview {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+    }
+
+    .stats-overview .stat-card {
+      background: linear-gradient(145deg, var(--secondary-color), #1e2a3d);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 25px;
+      text-align: center;
+    }
+
+    .stats-overview .stat-card .stat-value {
+      font-size: 2em;
+      font-weight: 700;
+      color: var(--accent-color);
+    }
+
+    .stats-overview .stat-card.highlight .stat-value {
+      color: var(--success-color);
+    }
+
+    .stats-overview .stat-card .stat-label {
+      color: var(--text-secondary);
+      margin-top: 10px;
+    }
+
+    .stats-chart {
+      background: linear-gradient(145deg, var(--secondary-color), #1e2a3d);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .chart-title {
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    .chart-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      height: 150px;
+      padding-top: 20px;
+    }
+
+    .chart-bar {
+      flex: 1;
+      background: var(--accent-color);
+      border-radius: 4px 4px 0 0;
+      min-height: 10px;
+    }
+
+    /* History Section */
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .history-item {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 15px 20px;
+      background: linear-gradient(145deg, var(--secondary-color), #1e2a3d);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+    }
+
+    .history-item .date {
+      color: var(--text-secondary);
+      font-size: 0.9em;
+    }
+
+    .history-item .details {
+      flex: 1;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .history-item .action {
+      color: var(--text-primary);
+    }
+
+    .history-item .space {
+      color: var(--success-color);
+      font-weight: 600;
+    }
+
+    .btn-details {
+      padding: 6px 12px;
+      background: var(--tertiary-color);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      color: var(--text-primary);
+      cursor: pointer;
+    }
+
+    /* About Section */
+    .about-card {
+      background: linear-gradient(145deg, var(--secondary-color), #1e2a3d);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 40px;
+      text-align: center;
+    }
+
+    .about-card .app-logo {
+      font-size: 4em;
+      margin-bottom: 20px;
+    }
+
+    .about-card .app-name {
+      font-size: 2em;
+      font-weight: 800;
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .about-card .app-version {
+      color: var(--text-secondary);
+      margin-top: 10px;
+    }
+
+    .about-card .app-desc {
+      color: var(--text-secondary);
+      margin-top: 15px;
+    }
+
+    .about-card .app-copyright {
+      color: var(--text-muted);
+      margin-top: 30px;
+      font-size: 0.85em;
+    }
+
+    .empty-state {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 200px;
+      color: var(--text-secondary);
+    }
+
+    /* Search Input */
+    .uninstaller-search input, .duplicates-folders input[type="text"] {
+      flex: 1;
+      padding: 12px 15px;
+      background: var(--primary-color);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-primary);
+    }
+
+    .duplicates-folders input[type="text"] {
+      width: 100%;
+    }
   </style>
 </head>
 <body>
+  <!-- Progress Overlay -->
+  <div id="progressSection" class="progress-overlay">
+    <div class="progress-modal">
+      <div class="progress-header">
+        <div class="progress-title" id="progressTitle">Analyse en cours...</div>
+      </div>
+      <div class="progress-circle-container">
+        <svg class="progress-circle" viewBox="0 0 140 140">
+          <defs>
+            <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#00d4ff"/>
+              <stop offset="100%" style="stop-color:#7b2ff2"/>
+            </linearGradient>
+          </defs>
+          <circle class="progress-circle-bg" cx="70" cy="70" r="60"/>
+          <circle class="progress-circle-fill" id="progressCircleFill" cx="70" cy="70" r="60"/>
+        </svg>
+        <div class="progress-circle-text">
+          <div class="progress-percent" id="progressPercent">0%</div>
+          <div class="progress-label" id="progressLabel">Progression</div>
+        </div>
+      </div>
+      <div class="progress-status" id="progressStatus">Analyse des fichiers temporaires...</div>
+      <button class="btn-cancel" onclick="cancelScan()">Annuler</button>
+    </div>
+  </div>
+
   <div class="app-container">
     <!-- Sidebar Navigation -->
     <div class="sidebar">
@@ -707,6 +2098,10 @@
           <div class="nav-item" data-mode="duplicates" onclick="switchMode('duplicates', event)">
             <span class="nav-icon">📋</span>
             <span>Fichiers Doublons</span>
+          </div>
+          <div class="nav-item" data-mode="startup" onclick="switchMode('startup', event)">
+            <span class="nav-icon">🚀</span>
+            <span>Démarrage</span>
           </div>
           <div class="nav-item" data-mode="uninstaller" onclick="switchMode('uninstaller', event)">
             <span class="nav-icon">🗑️</span>
@@ -755,188 +2150,178 @@
         </div>
       </div>
 
-      <!-- Content Area -->
-      <div class="content-area">
-        <!-- Left Panel - Main Content -->
-        <div style="display: flex; flex-direction: column; gap: 20px;">
-          <!-- Disk Status -->
-          <div class="card">
-            <div class="card-title">État du Disque</div>
-            <div style="display: flex; justify-content: space-between; align-items: flex-end;">
-              <div>
-                <div class="card-value" id="diskUsed">0 GB</div>
-                <div class="card-subtext">Utilisé sur <span id="diskTotal">0 GB</span></div>
+      <!-- Content Area - Style CCleaner -->
+      <div class="content-area ccleaner-style">
+        <!-- Header avec état du PC -->
+        <div class="dashboard-header">
+          <div class="pc-status" id="pcStatus">
+            <span class="status-icon">💻</span>
+            <span class="status-label">État du PC:</span>
+            <span class="status-value good" id="pcHealthStatus">Bon</span>
+          </div>
+          <div class="header-tip" id="headerTip">
+            <span class="tip-icon">💡</span>
+            <span class="tip-text">Gagnez +1.8 GB en vidant les caches de 3 navigateurs</span>
+          </div>
+        </div>
+
+        <!-- Grille principale 2 colonnes -->
+        <div class="dashboard-grid">
+          <!-- Colonne gauche: Actions principales -->
+          <div class="main-column">
+            <!-- Carte Analyse Rapide -->
+            <div class="action-card analyze-card" id="quickAnalyzeCard">
+              <div class="card-header">
+                <div class="card-icon">🔍</div>
+                <div class="card-title">Analyse Rapide</div>
               </div>
-              <div style="font-size: 1.2em; color: var(--accent-color);">💾</div>
+              <div class="card-body">
+                <div class="space-preview">
+                  <div class="space-label">Espace potentiellement libérable</div>
+                  <div class="space-value" id="potentialSpace">--</div>
+                  <div class="space-bar">
+                    <div class="space-bar-fill" id="potentialSpaceBar" style="width: 0%"></div>
+                  </div>
+                </div>
+                <div class="quick-checkboxes">
+                  <label class="quick-checkbox">
+                    <input type="checkbox" id="checkTemp" checked>
+                    <span class="checkmark"></span>
+                    <span class="checkbox-label">Fichiers temporaires</span>
+                    <span class="checkbox-size" id="tempSize">~120 MB</span>
+                  </label>
+                  <label class="quick-checkbox">
+                    <input type="checkbox" id="checkBrowser" checked>
+                    <span class="checkmark"></span>
+                    <span class="checkbox-label">Cache navigateur</span>
+                    <span class="checkbox-size" id="browserSize">~450 MB</span>
+                  </label>
+                  <label class="quick-checkbox">
+                    <input type="checkbox" id="checkRecycleBin" checked>
+                    <span class="checkmark"></span>
+                    <span class="checkbox-label">Corbeille</span>
+                    <span class="checkbox-size" id="recycleSize">~80 MB</span>
+                  </label>
+                </div>
+              </div>
+              <div class="card-footer">
+                <button class="btn-analyze" id="btnAnalyzeQuick" onclick="doQuickAnalyze()">
+                  <span class="btn-icon">⚙️</span>
+                  <span class="btn-text">Analyser</span>
+                </button>
+              </div>
             </div>
-            <div class="storage-bar">
-              <div class="storage-bar-container">
-                <div class="storage-bar-fill" id="diskBar" style="width: 0%"></div>
+
+            <!-- Carte Nettoyage Rapide -->
+            <div class="action-card clean-card" id="quickCleanCard">
+              <div class="card-header">
+                <div class="card-icon">🧹</div>
+                <div class="card-title">Nettoyage Rapide</div>
+              </div>
+              <div class="card-body">
+                <div class="clean-summary" id="cleanSummary">
+                  <div class="summary-item">
+                    <span class="summary-label">Fichiers détectés</span>
+                    <span class="summary-value" id="detectedFiles">0</span>
+                  </div>
+                  <div class="summary-item">
+                    <span class="summary-label">Espace à récupérer</span>
+                    <span class="summary-value highlight" id="spaceToRecover">0 MB</span>
+                  </div>
+                </div>
+                <div class="risk-info">
+                  <span class="risk-badge low">🛡️ Risque: Faible</span>
+                  <span class="risk-info-text">Ces fichiers sont temporaires et sûrs à supprimer</span>
+                </div>
+              </div>
+              <div class="card-footer">
+                <button class="btn-clean" id="btnCleanQuick" onclick="doQuickClean()" disabled>
+                  <span class="btn-icon">🧹</span>
+                  <span class="btn-text">Nettoyer maintenant</span>
+                </button>
+                <button class="btn-secondary" onclick="createRestorePoint()">
+                  <span class="btn-icon">💾</span>
+                  <span class="btn-text">Créer point de restauration</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Carte Santé et Outils -->
+            <div class="tools-row">
+              <div class="tool-card" onclick="switchMode('health', event)">
+                <div class="tool-icon">💊</div>
+                <div class="tool-title">Santé du Registre</div>
+                <div class="tool-desc">Nettoyer les entrées invalides</div>
+              </div>
+              <div class="tool-card" onclick="switchMode('startup', event)">
+                <div class="tool-icon">🚀</div>
+                <div class="tool-title">Démarrage</div>
+                <div class="tool-desc">Gérer les programmes au démarrage</div>
+              </div>
+              <div class="tool-card" onclick="switchMode('duplicates', event)">
+                <div class="tool-icon">📋</div>
+                <div class="tool-title">Fichiers Doublons</div>
+                <div class="tool-desc">Trouver les fichiers en double</div>
               </div>
             </div>
           </div>
 
-<!-- Cleaning Categories -->
-          <div id="mode-content">
-            <!-- Cleaned by switchMode -->
-          </div>
-          
-          <!-- Statistics Dashboard (hidden by default) -->
-          <div id="stats-dashboard" style="display: none;">
-            <div class="card" style="margin-bottom: 15px;">
-              <div class="card-title">📊 Statistiques</div>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
-                <div style="text-align: center; padding: 15px; background: rgba(0, 212, 255, 0.1); border-radius: 8px;">
-                  <div style="font-size: 1.8em; font-weight: 700; color: var(--accent-color);" id="totalScans">0</div>
-                  <div style="font-size: 0.75em; color: var(--text-secondary);">Analyses</div>
-                </div>
-                <div style="text-align: center; padding: 15px; background: rgba(0, 230, 118, 0.1); border-radius: 8px;">
-                  <div style="font-size: 1.8em; font-weight: 700; color: var(--success-color);" id="totalCleanups">0</div>
-                  <div style="font-size: 0.75em; color: var(--text-secondary);">Nettoyages</div>
-                </div>
-              </div>
-              <div style="margin-top: 15px; text-align: center; padding: 15px; background: rgba(255, 215, 0, 0.1); border-radius: 8px;">
-                <div style="font-size: 1.8em; font-weight: 700; color: var(--premium-gold);" id="totalSpaceFreed">0 GB</div>
-                <div style="font-size: 0.75em; color: var(--text-secondary);">Space Total Libéré</div>
-              </div>
-            </div>
-            
-            <!-- Mini Chart -->
-            <div class="card">
-              <div class="card-title">📈 Progression</div>
-              <div id="mini-chart" style="display: flex; align-items: flex-end; gap: 4px; height: 80px; padding-top: 10px;">
-                <!-- Bars will be generated by JS -->
+          <!-- Colonne droite: Panel actions rapides et infos -->
+          <div class="side-column">
+            <!-- Quick Actions -->
+            <div class="quick-panel">
+              <div class="panel-title">⚡ Actions Rapides</div>
+              <div class="quick-actions-list">
+                <button class="quick-action-button" onclick="quickScan()">
+                  <span class="qa-icon">🔍</span>
+                  <span class="qa-text"> Analyse Rapide</span>
+                </button>
+                <button class="quick-action-button" onclick="deepClean()">
+                  <span class="qa-icon">🧹</span>
+                  <span class="qa-text"> Nettoyage Profond</span>
+                </button>
+                <button class="quick-action-button" onclick="switchMode('advanced', event)">
+                  <span class="qa-icon">🔧</span>
+                  <span class="qa-text"> Nettoyage Avancé</span>
+                </button>
+                <button class="quick-action-button" onclick="checkUpdates()">
+                  <span class="qa-icon">🔄</span>
+                  <span class="qa-text"> Vérifier Mises à Jour</span>
+                </button>
               </div>
             </div>
-          </div>
-          
-          <!-- History Panel -->
-          <div id="history-panel" style="display: none;">
-            <div class="card">
-              <div class="card-title">📋 Historique des Nettoyages</div>
-              <div id="history-list" style="max-height: 250px; overflow-y: auto; margin-top: 10px;">
-                <!-- History items generated by JS -->
+
+            <!-- Stats Summary -->
+            <div class="stats-panel">
+              <div class="panel-title">📊 Statistiques</div>
+              <div class="stats-list">
+                <div class="stat-row">
+                  <span class="stat-label">Analyses effectuées</span>
+                  <span class="stat-value" id="totalScans">0</span>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-label">Sessions nettoyées</span>
+                  <span class="stat-value" id="totalCleanups">0</span>
+                </div>
+                <div class="stat-row highlight">
+                  <span class="stat-label">Espace total libéré</span>
+                  <span class="stat-value" id="totalSpaceFreed">0 MB</span>
+                </div>
               </div>
             </div>
-          </div>
-          
-          <!-- New Cleaning Options -->
-          <div id="extra-cleaning-options" style="display: none;">
-            <div class="cleaning-section">
-              <div class="section-header">
-                <span>🆕 Options Avancées</span>
+
+            <!-- Admin Banner -->
+            <div class="admin-banner" id="adminBanner">
+              <div class="admin-icon">⚠️</div>
+              <div class="admin-text">
+                <div class="admin-title">Exécutez en administrateur</div>
+                <div class="admin-desc">Pour un nettoyage complet</div>
               </div>
-              <div class="section-items">
-                <div class="item-row">
-                  <input type="checkbox" data-cat="drivers" checked>
-                  <div class="item-info">
-                    <span class="item-name">📦 Anciens Drivers</span>
-                    <span class="item-size">~150 MB</span>
-                  </div>
-                </div>
-                <div class="item-row">
-                  <input type="checkbox" data-cat="windowsupdate" checked>
-                  <div class="item-info">
-                    <span class="item-name">🔄 Windows Update Cache</span>
-                    <span class="item-size">~500 MB</span>
-                  </div>
-                </div>
-                <div class="item-row">
-                  <input type="checkbox" data-cat="oldLogs" checked>
-                  <div class="item-info">
-                    <span class="item-name">📝 Anciens Fichiers Log</span>
-                    <span class="item-size">~80 MB</span>
-                  </div>
-                </div>
-                <div class="item-row">
-                  <input type="checkbox" data-cat="tempLogs" checked>
-                  <div class="item-info">
-                    <span class="item-name">📋 Logs Temporaires</span>
-                    <span class="item-size">~25 MB</span>
-                  </div>
-                </div>
-              </div>
+              <button class="admin-btn" onclick="restartAsAdmin()">Relancer</button>
             </div>
           </div>
         </div>
 
-        <!-- Right Panel - Dashboard -->
-        <div style="display: flex; flex-direction: column; gap: 20px;">
-          <!-- Scan Results -->
-          <div class="card">
-            <div class="card-title">Analyse du Système</div>
-            <div style="space: 15px;">
-              <div style="margin-bottom: 12px;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                  <span>Fichiers Détectés</span>
-                  <span class="card-value" style="font-size: 1.4em;" id="filesDetected">0</span>
-                </div>
-              </div>
-              <div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                  <span>Espace à Récupérer</span>
-                  <span class="card-value" style="font-size: 1.4em;" id="spaceToFree">0 MB</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Admin Status -->
-          <div class="card">
-            <div class="status-indicator" id="adminStatusCard">
-              <div class="status-dot"></div>
-              <div class="status-text">Vérification des droits...</div>
-            </div>
-          </div>
-
-<!-- Progress Section -->
-          <div class="progress-section" id="progressSection" style="display: none;">
-            <div class="progress-title">Progression</div>
-            <div class="progress-bar-container">
-              <div class="progress-bar-fill" id="progressBar" style="width: 0%"></div>
-            </div>
-            <div class="progress-text" id="progressText">0%</div>
-          </div>
-
-          <!-- Control Buttons -->
-          <div class="controls">
-            <button class="btn btn-primary" id="scanBtn" onclick="handleScan()">
-              ⚙️ ANALYSER
-            </button>
-            <button class="btn btn-secondary" id="cleanBtn" onclick="handleClean()" disabled>
-              🧹 NETTOYER
-            </button>
-            <button class="btn btn-premium" onclick="activatePremium()">
-              💎 ACTIVER PREMIUM
-            </button>
-          </div>
-
-<!-- Progression Circle -->
-          <div class="logs-section">
-            <div class="progress-circle-container" id="progressCircleContainer">
-              <div class="progress-circle" id="progressCircle">
-                <svg viewBox="0 0 140 140">
-                  <defs>
-                    <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stop-color="#00d4ff"/>
-                      <stop offset="100%" stop-color="#0099cc"/>
-                    </linearGradient>
-                  </defs>
-                  <circle class="progress-circle-bg" cx="70" cy="70" r="60"/>
-                  <circle class="progress-circle-fill status-glow" id="progressCircleFill" cx="70" cy="70" r="60"/>
-                </svg>
-                <div class="progress-circle-text">
-                  <div class="progress-percent" id="progressPercent">0%</div>
-                  <div class="progress-label" id="progressLabel">Progression</div>
-                </div>
-              </div>
-            </div>
-            <!-- Legacy logs for compatibility -->
-            <div class="logs-container" id="logsContainer" style="display:none;">
-              <div class="log-entry info">Initialisation de GLOCK CLEANER...</div>
-              <div class="log-entry info">Prêt pour l'analyse</div>
-            </div>
-          </div>
         </div>
       </div>
     </div>

@@ -20,6 +20,15 @@ contextBridge.exposeInMainWorld('api', {
   // Mettre à jour la config
   updateConfig: (newConfig) => ipcRenderer.invoke('update-config', newConfig),
 
+  // Créer un point de restauration système
+  createRestorePoint: () => ipcRenderer.invoke('create-restore-point'),
+
+  // Désinstaller une application
+  uninstallApp: (appName) => ipcRenderer.invoke('uninstall-app', appName),
+
+  // Ouvrir un lien externe
+  openExternal: (url) => ipcRenderer.invoke('open-external', url),
+
   // Écouter les mises à jour de progression (réel)
   onCleanProgress: (callback) => {
     ipcRenderer.on('clean-progress', (event, data) => callback(data));

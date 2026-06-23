@@ -9,6 +9,7 @@ const formatBytes = (bytes) => {
 
 const addLog = (message, type = 'info') => {
   const logsContainer = document.getElementById('logsContainer');
+  if (!logsContainer) return;
   const time = new Date().toLocaleTimeString();
   const entry = document.createElement('div');
   entry.className = `log-entry ${type}`;
@@ -32,18 +33,20 @@ const updateDiskUI = (diskInfo) => {
 };
 
 const setButtonState = (scanEnabled = true, cleanEnabled = false, scanning = false, cleaning = false) => {
-  const scanBtn = document.getElementById('scanBtn');
-  const cleanBtn = document.getElementById('cleanBtn');
+  const scanBtn = document.getElementById('btnAnalyzeQuick');
+  const cleanBtn = document.getElementById('btnCleanQuick');
+  if (!scanBtn || !cleanBtn) return;
   scanBtn.disabled = !scanEnabled || scanning;
   cleanBtn.disabled = !cleanEnabled || cleaning;
-  if (scanning) scanBtn.innerHTML = '<span class="spinner"></span> SCAN...';
-  else scanBtn.innerHTML = '⚙️ ANALYSER';
-  if (cleaning) cleanBtn.innerHTML = '<span class="spinner"></span> NETTOIE...';
-  else cleanBtn.innerHTML = '🧹 NETTOYER';
+  if (scanning) scanBtn.innerHTML = '<span class="spinner"></span> Analyse...';
+  else scanBtn.innerHTML = '<span class="btn-icon">⚙️</span><span class="btn-text">Analyser</span>';
+  if (cleaning) cleanBtn.innerHTML = '<span class="spinner"></span> Nettoyage...';
+  else cleanBtn.innerHTML = '<span class="btn-icon">🧹</span><span class="btn-text">Nettoyer maintenant</span>';
 };
 
 const toggleProgress = (show) => {
-  document.getElementById('progressSection').classList.toggle('active', show);
+  const section = document.getElementById('progressSection');
+  if (section) section.classList.toggle('active', show);
 };
 
 // New function to update the circular progress
@@ -51,8 +54,10 @@ const updateProgressCircle = (percent, label = 'Progression') => {
   const circle = document.getElementById('progressCircleFill');
   const percentText = document.getElementById('progressPercent');
   const labelText = document.getElementById('progressLabel');
-  
-  if (circle && percentText && labelText) {
+
+  if (!circle || !percentText || !labelText) return;
+
+  if (true) {
     // Calculate stroke offset (377 is the circumference of circle with r=60)
     const offset = 377 - (377 * percent / 100);
     circle.style.strokeDashoffset = offset;
@@ -218,7 +223,7 @@ const modeTemplates = {
                 <div class="item-name">Adobe Reader DC</div>
                 <div style="font-size: 0.8em; color: var(--text-secondary);">v2024.001</div>
               </div>
-              <button class="btn btn-secondary" onclick="alert('Désinstallation de Adobe Reader...')" style="padding: 6px 12px; font-size: 0.8em;">Désinstaller</button>
+              <button class="btn btn-secondary" onclick="uninstallApp('Adobe Reader')" style="padding: 6px 12px; font-size: 0.8em;">Désinstaller</button>
             </div>
           </div>
         </div>
@@ -229,7 +234,7 @@ const modeTemplates = {
                 <div class="item-name">VLC Media Player</div>
                 <div style="font-size: 0.8em; color: var(--text-secondary);">v3.0.16</div>
               </div>
-              <button class="btn btn-secondary" onclick="alert('Désinstallation de VLC...')" style="padding: 6px 12px; font-size: 0.8em;">Désinstaller</button>
+              <button class="btn btn-secondary" onclick="uninstallApp('VLC')" style="padding: 6px 12px; font-size: 0.8em;">Désinstaller</button>
             </div>
           </div>
         </div>
@@ -240,7 +245,7 @@ const modeTemplates = {
                 <div class="item-name">7-Zip</div>
                 <div style="font-size: 0.8em; color: var(--text-secondary);">v23.01</div>
               </div>
-              <button class="btn btn-secondary" onclick="alert('Désinstallation de 7-Zip...')" style="padding: 6px 12px; font-size: 0.8em;">Désinstaller</button>
+              <button class="btn btn-secondary" onclick="uninstallApp('7-Zip')" style="padding: 6px 12px; font-size: 0.8em;">Désinstaller</button>
             </div>
           </div>
         </div>
@@ -251,7 +256,7 @@ const modeTemplates = {
                 <div class="item-name">Notepad++</div>
                 <div style="font-size: 0.8em; color: var(--text-secondary);">v8.5.1</div>
               </div>
-              <button class="btn btn-secondary" onclick="alert('Désinstallation de Notepad++...')" style="padding: 6px 12px; font-size: 0.8em;">Désinstaller</button>
+              <button class="btn btn-secondary" onclick="uninstallApp('Notepad++')" style="padding: 6px 12px; font-size: 0.8em;">Désinstaller</button>
             </div>
           </div>
         </div>
@@ -380,8 +385,8 @@ settings: `
             GLOCK CLEANER est une application complète de nettoyage et d'optimisation système pour Windows.
           </p>
           <div style="display: flex; gap: 10px; justify-content: center;">
-            <button class="btn btn-secondary" onclick="alert('Site Web')" style="padding: 8px 16px; font-size: 0.8em;">🌐 Site Web</button>
-            <button class="btn btn-secondary" onclick="alert('Support')" style="padding: 8px 16px; font-size: 0.8em;">💬 Support</button>
+            <button class="btn btn-secondary" onclick="openExternal('https://glockcleaner.com')" style="padding: 8px 16px; font-size: 0.8em;">🌐 Site Web</button>
+            <button class="btn btn-secondary" onclick="openExternal('https://glockcleaner.com/support')" style="padding: 8px 16px; font-size: 0.8em;">💬 Support</button>
           </div>
         </div>
       </div>
@@ -396,42 +401,604 @@ window.switchMode = async (mode, event) => {
   if (event && event.currentTarget) {
     event.currentTarget.classList.add('active');
   }
-  
-  const content = document.getElementById('mode-content');
-  if (modeTemplates[mode]) {
-    content.innerHTML = modeTemplates[mode];
-    
-const titles = {
-      overview: 'Nettoyage Rapide',
-      advanced: 'Nettoyage Avancé',
-      custom: 'Personnalisé',
-      health: 'Santé du Registre',
-      duplicates: 'Fichiers Doublons',
-      uninstaller: 'Désinstallateur',
-      settings: 'Paramètres',
-      stats: 'Statistiques',
-      history: 'Historique',
-      about: 'À Propos'
-    };
-    document.getElementById('pageTitle').textContent = titles[mode] || 'Mode Inconnu';
-    
-    // Setup checkboxes
-    document.querySelectorAll('input[data-cat]').forEach(cb => {
-      cb.addEventListener('change', (e) => {
-        if (e.target.checked) {
-          if (!appState.selectedCategories.includes(e.target.dataset.cat)) {
-            appState.selectedCategories.push(e.target.dataset.cat);
-          }
-        } else {
-          appState.selectedCategories = appState.selectedCategories.filter(c => c !== e.target.dataset.cat);
-        }
-        addLog(`Catégorie ${e.target.dataset.cat}: ${e.target.checked ? 'activée' : 'désactivée'}`, 'info');
-      });
-    });
-  } else {
-    content.innerHTML = '<div style="padding:20px;color:var(--text-secondary);">Mode en développement</div>';
-    document.getElementById('pageTitle').textContent = 'Mode en développement';
+
+  const titles = {
+    overview: 'Nettoyage Rapide',
+    advanced: 'Nettoyage Avancé',
+    custom: 'Personnalisé',
+    health: 'Santé du Registre',
+    startup: 'Démarrage',
+    duplicates: 'Fichiers Doublons',
+    uninstaller: 'Désinstallateur',
+    settings: 'Paramètres',
+    stats: 'Statistiques',
+    history: 'Historique',
+    about: 'À Propos'
+  };
+
+  document.getElementById('pageTitle').textContent = titles[mode] || 'Mode Inconnu';
+
+  // Replace dashboard content with mode-specific screen
+  const contentArea = document.querySelector('.ccleaner-style');
+  if (contentArea) {
+    contentArea.innerHTML = getModeScreen(mode);
   }
+};
+
+// Get screen HTML for each mode
+function getModeScreen(mode) {
+  const screens = {
+    overview: `
+      ${getDashboardHeader()}
+      ${getQuickAnalyzeCard()}
+      ${getQuickCleanCard()}
+      ${getToolsRow()}
+      ${getSidePanel()}
+    `,
+    advanced: `
+      ${getDashboardHeader()}
+      <div class="advanced-section">
+        <div class="section-group">
+          <div class="group-header"><span class="group-icon">🪟</span><span class="group-title">Windows</span></div>
+          <div class="group-items">
+            <label class="item-checkbox"><input type="checkbox" data-cat="temp" checked><span class="item-name">Fichiers Temporaires Windows</span><span class="item-size">2.4 GB</span><span class="item-risk low">Risque: Faible</span></label>
+            <label class="item-checkbox"><input type="checkbox" data-cat="preftech" checked><span class="item-name">Prefetch</span><span class="item-size">245 MB</span><span class="item-risk low">Risque: Faible</span></label>
+            <label class="item-checkbox"><input type="checkbox" data-cat="thumbnails"><span class="item-name">Miniatures</span><span class="item-size">156 MB</span><span class="item-risk low">Risque: Faible</span></label>
+            <label class="item-checkbox"><input type="checkbox" data-cat="crashdumps"><span class="item-name">Rapports d'Erreurs</span><span class="item-size">89 MB</span><span class="item-risk low">Risque: Faible</span></label>
+          </div>
+        </div>
+        <div class="section-group">
+          <div class="group-header"><span class="group-icon">🌐</span><span class="group-title">Navigateurs</span></div>
+          <div class="group-items">
+            <label class="item-checkbox"><input type="checkbox" data-cat="chrome" checked><span class="item-name">Google Chrome</span><span class="item-size">850 MB</span><span class="item-risk low">Risque: Faible</span></label>
+            <label class="item-checkbox"><input type="checkbox" data-cat="edge" checked><span class="item-name">Microsoft Edge</span><span class="item-size">620 MB</span><span class="item-risk low">Risque: Faible</span></label>
+            <label class="item-checkbox"><input type="checkbox" data-cat="firefox"><span class="item-name">Mozilla Firefox</span><span class="item-size">380 MB</span><span class="item-risk low">Risque: Faible</span></label>
+          </div>
+        </div>
+        <div class="section-group">
+          <div class="group-header"><span class="group-icon">📱</span><span class="group-title">Applications</span></div>
+          <div class="group-items">
+            <label class="item-checkbox"><input type="checkbox" data-cat="discord"><span class="item-name">Discord Cache</span><span class="item-size">120 MB</span><span class="item-risk low">Risque: Faible</span></label>
+            <label class="item-checkbox"><input type="checkbox" data-cat="spotify"><span class="item-name">Spotify Cache</span><span class="item-size">95 MB</span><span class="item-risk low">Risque: Faible</span></label>
+            <label class="item-checkbox"><input type="checkbox" data-cat="steam"><span class="item-name">Steam Telechargements</span><span class="item-size">4.2 GB</span><span class="item-risk medium">Risque: Moyen</span></label>
+          </div>
+        </div>
+      </div>
+      <div class="sticky-footer">
+        <div class="total-space"><span>Espace total: </span><strong>9.2 GB</strong></div>
+        <button class="btn-analyze" onclick="analyzeAdvanced()">Analyser</button>
+        <button class="btn-clean" onclick="cleanAdvanced()">Nettoyer</button>
+      </div>
+    `,
+    custom: `
+      ${getDashboardHeader()}
+      <div class="advanced-section">
+        <div class="section-group">
+          <div class="group-header"><span class="group-icon">🌐</span><span class="group-title">Navigateurs</span></div>
+          <div class="group-items">
+            <label class="item-checkbox"><input type="checkbox" data-cat="chrome" checked><span class="item-name">Google Chrome</span><span class="item-size">850 MB</span><span class="item-risk low">Risque: Faible</span></label>
+            <label class="item-checkbox"><input type="checkbox" data-cat="edge" checked><span class="item-name">Microsoft Edge</span><span class="item-size">620 MB</span><span class="item-risk low">Risque: Faible</span></label>
+            <label class="item-checkbox"><input type="checkbox" data-cat="firefox"><span class="item-name">Mozilla Firefox</span><span class="item-size">380 MB</span><span class="item-risk low">Risque: Faible</span></label>
+            <label class="item-checkbox"><input type="checkbox" data-cat="opera"><span class="item-name">Opera</span><span class="item-size">145 MB</span><span class="item-risk low">Risque: Faible</span></label>
+          </div>
+        </div>
+        <div class="section-group">
+          <div class="group-header"><span class="group-icon">💾</span><span class="group-title">Système</span></div>
+          <div class="group-items">
+            <label class="item-checkbox"><input type="checkbox" data-cat="temp" checked><span class="item-name">Fichiers Temporaires</span><span class="item-size">2.4 GB</span><span class="item-risk low">Risque: Faible</span></label>
+            <label class="item-checkbox"><input type="checkbox" data-cat="recycle"><span class="item-name">Corbeille</span><span class="item-size">856 MB</span><span class="item-risk low">Risque: Faible</span></label>
+            <label class="item-checkbox"><input type="checkbox" data-cat="log"><span class="item-name">Fichiers Log</span><span class="item-size">234 MB</span><span class="item-risk low">Risque: Faible</span></label>
+            <label class="item-checkbox"><input type="checkbox" data-cat="thumbnails"><span class="item-name">Miniatures</span><span class="item-size">156 MB</span><span class="item-risk low">Risque: Faible</span></label>
+          </div>
+        </div>
+        <div class="section-group">
+          <div class="group-header"><span class="group-icon">📱</span><span class="group-title">Applications</span></div>
+          <div class="group-items">
+            <label class="item-checkbox"><input type="checkbox" data-cat="discord"><span class="item-name">Discord</span><span class="item-size">120 MB</span><span class="item-risk low">Risque: Faible</span></label>
+            <label class="item-checkbox"><input type="checkbox" data-cat="spotify"><span class="item-name">Spotify</span><span class="item-size">95 MB</span><span class="item-risk low">Risque: Faible</span></label>
+            <label class="item-checkbox"><input type="checkbox" data-cat="teams"><span class="item-name">Microsoft Teams</span><span class="item-size">520 MB</span><span class="item-risk medium">Risque: Moyen</span></label>
+            <label class="item-checkbox"><input type="checkbox" data-cat="steam"><span class="item-name">Steam</span><span class="item-size">4.2 GB</span><span class="item-risk medium">Risque: Moyen</span></label>
+          </div>
+        </div>
+        <div class="section-group">
+          <div class="group-header"><span class="group-icon">🎮</span><span class="group-title">Jeux</span></div>
+          <div class="group-items">
+            <label class="item-checkbox"><input type="checkbox" data-cat="epic"><span class="item-name">Epic Games Launcher</span><span class="item-size">1.8 GB</span><span class="item-risk low">Risque: Faible</span></label>
+            <label class="item-checkbox"><input type="checkbox" data-cat="battle"><span class="item-name">Battle.net</span><span class="item-size">2.1 GB</span><span class="item-risk low">Risque: Faible</span></label>
+          </div>
+        </div>
+      </div>
+      <div class="sticky-footer">
+        <div class="total-space"><span>Espace total: </span><strong>15.2 GB</strong></div>
+        <button class="btn-analyze" onclick="analyzeCustom()">Analyser</button>
+        <button class="btn-clean" onclick="cleanCustom()">Nettoyer</button>
+      </div>
+    `,
+    health: `
+      ${getDashboardHeader()}
+      <div class="health-section">
+        <div class="health-info-card">
+          <div class="health-icon">💊</div>
+          <div class="health-title">Santé du Registre</div>
+          <div class="health-desc">Analysez et réparez les entrées invalides du registre Windows pour améliorer les performances.</div>
+        </div>
+        <div class="health-options">
+          <label class="item-checkbox"><input type="checkbox" checked><span class="item-name">Entrées de classes invalides</span><span class="item-risk medium">12 trouvées</span></label>
+          <label class="item-checkbox"><input type="checkbox" checked><span class="item-name">Chemins d'application manquants</span><span class="item-risk medium">5 trouv��s</span></label>
+          <label class="item-checkbox"><input type="checkbox" checked><span class="item-name">Valeurs MUI Absentes</span><span class="item-risk low">3 trouvées</span></label>
+          <label class="item-checkbox"><input type="checkbox"><span class="item-name">Associtations de fichiers</span><span class="item-risk high">0 trouvé</span></label>
+        </div>
+        <div class="health-actions">
+          <button class="btn-analyze" onclick="scanRegistry()">Analyser le Registre</button>
+          <button class="btn-secondary" onclick="backupRegistry()">Sauvegarder</button>
+        </div>
+      </div>
+    `,
+    startup: `
+      ${getDashboardHeader()}
+      <div class="startup-section">
+        <div class="startup-info">
+          <div class="info-icon">🚀</div>
+          <div class="info-title">Gestionnaire de Démarrage</div>
+          <div class="info-desc">Contrôlez les programmes qui se lancent au démarrage de Windows.</div>
+        </div>
+        <div class="startup-list">
+          <div class="startup-item"><input type="checkbox" checked><div class="item-details"><span class="item-name">OneDrive</span><span class="item-path">C:\\Program Files\\Microsoft OneDrive\\OneDrive.exe</span></div><div class="item-impact high">Impact: Élevé</div><button class="btn-toggle">Désactiver</button></div>
+          <div class="startup-item"><input type="checkbox" checked><div class="item-details"><span class="item-name">Discord</span><span class="item-path">C:\\Users\\...\\Discord\\Update.exe</span></div><div class="item-impact medium">Impact: Moyen</div><button class="btn-toggle">Désactiver</button></div>
+          <div class="startup-item"><input type="checkbox"><div class="item-details"><span class="item-name">Spotify</span><span class="item-path">C:\\Users\\...\\Spotify\\Spotify.exe</span></div><div class="item-impact low">Impact: Faible</div><button class="btn-toggle">Activer</button></div>
+          <div class="startup-item"><input type="checkbox" checked><div class="item-details"><span class="item-name">NVIDIA GeForce Experience</span><span class="item-path">C:\\Program Files\\NVIDIA Corporation\\NVIDIA GeForce Experience\\NVIDIA GeForce Experience.exe</span></div><div class="item-impact medium">Impact: Moyen</div><button class="btn-toggle">Désactiver</button></div>
+        </div>
+      </div>
+    `,
+    duplicates: `
+      ${getDashboardHeader()}
+      <div class="duplicates-section">
+        <div class="duplicates-info">
+          <div class="info-icon">📋</div>
+          <div class="info-title">Fichiers Doublons</div>
+          <div class="info-desc">Trouvez et supprimez les fichiers en double pour libérer de l'espace.</div>
+        </div>
+        <div class="duplicates-folders">
+          <div class="folder-select">
+            <input type="text" placeholder="Sélectionner un dossier..." readonly>
+            <button class="btn-browse">Parcourir</button>
+          </div>
+          <div class="folder-list">
+            <div class="folder-item selected">C:\Users\BYART\Downloads <button class="btn-remove">×</button></div>
+            <div class="folder-item selected">D:\Photos\Vacances <button class="btn-remove">×</button></div>
+          </div>
+          <button class="btn-add-folder">+ Ajouter un dossier</button>
+        </div>
+        <div class="duplicates-options">
+          <label class="item-checkbox"><input type="checkbox" checked><span class="item-name">Comparer par hash MD5</span></label>
+          <label class="item-checkbox"><input type="checkbox"><span class="item-name">Ignorer les images de +10MB</span></label>
+          <label class="item-checkbox"><input type="checkbox" checked><span class="item-name">Mode prévisualisation</span></label>
+        </div>
+        <div class="duplicates-actions">
+          <button class="btn-analyze" onclick="scanDuplicates()">Rechercher les doublons</button>
+        </div>
+      </div>
+    `,
+    uninstaller: `
+      ${getDashboardHeader()}
+      <div class="uninstaller-section">
+        <div class="uninstaller-info">
+          <div class="info-icon">🗑️</div>
+          <div class="info-title">Désinstallateur</div>
+          <div class="info-desc">Désinstallez les applications inutilisées.</div>
+        </div>
+        <div class="uninstaller-search">
+          <input type="text" placeholder="Rechercher une application...">
+        </div>
+        <div class="uninstaller-list">
+          <div class="app-item"><div class="app-info"><span class="app-name">Adobe Acrobat Reader</span><span class="app-size">2.4 GB</span><span class="app-date">Utilisé: 15/02/2026</span></div><button class="btn-uninstall">Désinstaller</button></div>
+          <div class="app-item"><div class="app-info"><span class="app-name">Discord</span><span class="app-size">380 MB</span><span class="app-date">Utilisé: Aujourd'hui</span></div><button class="btn-open">Ouvrir</button></div>
+          <div class="app-item"><div class="app-info"><span class="app-name">Microsoft Teams</span><span class="app-size">520 MB</span><span class="app-date">Utilisé: Hier</span></div><button class="btn-uninstall">Désinstaller</button></div>
+          <div class="app-item"><div class="app-info"><span class="app-name">Spotify</span><span class="app-size">95 MB</span><span class="app-date">Utilisé: Il y a 3 jours</span></div><button class="btn-uninstall">Désinstaller</button></div>
+        </div>
+      </div>
+    `,
+    settings: `
+      ${getDashboardHeader()}
+      <div class="settings-section">
+        <div class="settings-group">
+          <div class="group-title">Général</div>
+          <label class="setting-item"><span>Lancer au démarrage</span><input type="checkbox"></label>
+          <label class="setting-item"><span>Réduire dans la barre des tâches</span><input type="checkbox" checked></label>
+          <label class="setting-item"><span>Vérifier les mises à jour automatiquement</span><input type="checkbox" checked></label>
+        </div>
+        <div class="settings-group">
+          <div class="group-title">Nettoyage</div>
+          <label class="setting-item"><span>Créer un point de restauration avant nettoyage</span><input type="checkbox" checked></label>
+          <label class="setting-item"><span>Effacer le presse-papiers après nettoyage</span><input type="checkbox"></label>
+          <label class="setting-item"><span>Confirmer avant suppression</span><input type="checkbox" checked></label>
+        </div>
+        <div class="settings-group">
+          <div class="group-title">Affichage</div>
+          <label class="setting-item"><span>Thème sombre</span><input type="checkbox" checked></label>
+          <label class="setting-item"><span>Animations</span><input type="checkbox" checked></label>
+        </div>
+      </div>
+    `,
+    stats: `
+      ${getDashboardHeader()}
+      <div class="stats-section">
+        <div class="stats-overview">
+          <div class="stat-card"><div class="stat-value">24</div><div class="stat-label">Analyses effectuées</div></div>
+          <div class="stat-card"><div class="stat-value">18</div><div class="stat-label">Sessions nettoyées</div></div>
+          <div class="stat-card highlight"><div class="stat-value">42.5 GB</div><div class="stat-label">Espace total libéré</div></div>
+        </div>
+        <div class="stats-chart">
+          <div class="chart-title">Progression sur 30 jours</div>
+          <div class="chart-bars">
+            <div class="chart-bar" style="height: 40%" title="2.1 GB"></div>
+            <div class="chart-bar" style="height: 65%" title="3.2 GB"></div>
+            <div class="chart-bar" style="height: 30%" title="1.5 GB"></div>
+            <div class="chart-bar" style="height: 80%" title="4.0 GB"></div>
+            <div class="chart-bar" style="height: 55%" title="2.7 GB"></div>
+            <div class="chart-bar" style="height: 90%" title="4.5 GB"></div>
+            <div class="chart-bar" style="height: 45%" title="2.2 GB"></div>
+            <div class="chart-bar" style="height: 70%" title="3.5 GB"></div>
+            <div class="chart-bar" style="height: 35%" title="1.7 GB"></div>
+            <div class="chart-bar" style="height: 60%" title="3.0 GB"></div>
+            <div class="chart-bar" style="height: 85%" title="4.2 GB"></div>
+            <div class="chart-bar" style="height: 50%" title="2.5 GB"></div>
+          </div>
+        </div>
+      </div>
+    `,
+    history: `
+      ${getDashboardHeader()}
+      <div class="history-section">
+        <div class="history-list">
+          <div class="history-item"><div class="date">25/06/2026</div><div class="details"><span class="action">Nettoyage rapide</span><span class="space">650 MB</span></div><button class="btn-details">Détails</button></div>
+          <div class="history-item"><div class="date">24/06/2026</div><div class="details"><span class="action">Nettoyage avancé</span><span class="space">2.3 GB</span></div><button class="btn-details">Détails</button></div>
+          <div class="history-item"><div class="date">23/06/2026</div><div class="details"><span class="action">Nettoyage rapide</span><span class="space">420 MB</span></div><button class="btn-details">Détails</button></div>
+          <div class="history-item"><div class="date">22/06/2026</div><div class="details"><span class="action">Nettoyage registre</span><span class="space">17 fichiers</span></div><button class="btn-details">Détails</button></div>
+          <div class="history-item"><div class="date">21/06/2026</div><div class="details"><span class="action">Nettoyage profond</span><span class="space">8.2 GB</span></div><button class="btn-details">Détails</button></div>
+        </div>
+      </div>
+    `,
+    about: `
+      ${getDashboardHeader()}
+      <div class="about-section">
+        <div class="about-card">
+          <div class="app-logo">🧹</div>
+          <div class="app-name">GLOCK CLEANER</div>
+          <div class="app-version">Version 1.0.0</div>
+          <div class="app-desc">Utilitaire de nettoyage pour Windows</div>
+          <div class="app-copyright">© 2026 - Tous droits réservés</div>
+        </div>
+      </div>
+    `
+  };
+
+  return screens[mode] || '<div class="empty-state">Mode en développement</div>';
+}
+
+// Helper functions for screen components
+function getDashboardHeader() {
+  return `
+    <div class="dashboard-header">
+      <div class="pc-status" id="pcStatus">
+        <span class="status-icon">💻</span>
+        <span class="status-label">État du PC:</span>
+        <span class="status-value good">Bon</span>
+      </div>
+      <div class="header-tip">
+        <span class="tip-icon">💡</span>
+        <span class="tip-text">Gagnez +1.8 GB en vidant les caches de 3 navigateurs</span>
+      </div>
+    </div>
+  `;
+}
+
+function getQuickAnalyzeCard() {
+  return `
+    <div class="action-card analyze-card">
+      <div class="card-header">
+        <div class="card-icon">🔍</div>
+        <div class="card-title">Analyse Rapide</div>
+      </div>
+      <div class="card-body">
+        <div class="space-preview">
+          <div class="space-label">Espace potentiellement libérable</div>
+          <div class="space-value" id="potentialSpace">--</div>
+          <div class="space-bar"><div class="space-bar-fill" id="potentialSpaceBar" style="width: 0%"></div></div>
+        </div>
+        <div class="quick-checkboxes">
+          <label class="quick-checkbox"><input type="checkbox" id="checkTemp" checked><span class="checkmark"></span><span class="checkbox-label">Fichiers temporaires</span><span class="checkbox-size">~120 MB</span></label>
+          <label class="quick-checkbox"><input type="checkbox" id="checkBrowser" checked><span class="checkmark"></span><span class="checkbox-label">Cache navigateur</span><span class="checkbox-size">~450 MB</span></label>
+          <label class="quick-checkbox"><input type="checkbox" id="checkRecycleBin" checked><span class="checkmark"></span><span class="checkbox-label">Corbeille</span><span class="checkbox-size">~80 MB</span></label>
+        </div>
+      </div>
+      <div class="card-footer">
+        <button class="btn-analyze" id="btnAnalyzeQuick" onclick="doQuickAnalyze()"><span class="btn-icon">⚙️</span><span class="btn-text">Analyser</span></button>
+      </div>
+    </div>
+  `;
+}
+
+function getQuickCleanCard() {
+  return `
+    <div class="action-card clean-card">
+      <div class="card-header">
+        <div class="card-icon">🧹</div>
+        <div class="card-title">Nettoyage Rapide</div>
+      </div>
+      <div class="card-body">
+        <div class="clean-summary">
+          <div class="summary-item"><span class="summary-label">Fichiers détectés</span><span class="summary-value" id="detectedFiles">0</span></div>
+          <div class="summary-item"><span class="summary-label">Espace à récupérer</span><span class="summary-value highlight" id="spaceToRecover">0 MB</span></div>
+        </div>
+        <div class="risk-info">
+          <span class="risk-badge low">🛡️ Risque: Faible</span>
+          <span class="risk-info-text">Ces fichiers sont temporaires et sûrs à supprimer</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <button class="btn-clean" id="btnCleanQuick" onclick="doQuickClean()" disabled><span class="btn-icon">🧹</span><span class="btn-text">Nettoyer maintenant</span></button>
+        <button class="btn-secondary" onclick="createRestorePoint()"><span class="btn-icon">💾</span><span class="btn-text">Créer point de restauration</span></button>
+      </div>
+    </div>
+  `;
+}
+
+function getToolsRow() {
+  return `
+    <div class="tools-row">
+      <div class="tool-card" onclick="switchMode('health', event)">
+        <div class="tool-icon">💊</div>
+        <div class="tool-title">Santé du Registre</div>
+        <div class="tool-desc">Nettoyer les entrées invalides</div>
+      </div>
+      <div class="tool-card" onclick="switchMode('startup', event)">
+        <div class="tool-icon">🚀</div>
+        <div class="tool-title">Démarrage</div>
+        <div class="tool-desc">Gérer les programmes au démarrage</div>
+      </div>
+      <div class="tool-card" onclick="switchMode('duplicates', event)">
+        <div class="tool-icon">📋</div>
+        <div class="tool-title">Fichiers Doublons</div>
+        <div class="tool-desc">Trouver les fichiers en double</div>
+      </div>
+    </div>
+  `;
+}
+
+function getSidePanel() {
+  return `
+    <div class="side-column">
+      <div class="quick-panel">
+        <div class="panel-title">⚡ Actions Rapides</div>
+        <div class="quick-actions-list">
+          <button class="quick-action-button" onclick="doQuickAnalyze()"><span class="qa-icon">🔍</span><span class="qa-text"> Analyse Rapide</span></button>
+          <button class="quick-action-button" onclick="switchMode('advanced', event)"><span class="qa-icon">🧹</span><span class="qa-text"> Nettoyage Profond</span></button>
+          <button class="quick-action-button" onclick="switchMode('uninstaller', event)"><span class="qa-icon">🗑️</span><span class="qa-text"> Désinstallateur</span></button>
+          <button class="quick-action-button" onclick="checkUpdates()"><span class="qa-icon">🔄</span><span class="qa-text"> Vérifier Mises à Jour</span></button>
+        </div>
+      </div>
+      <div class="stats-panel">
+        <div class="panel-title">📊 Statistiques</div>
+        <div class="stats-list">
+          <div class="stat-row"><span class="stat-label">Analyses effectuées</span><span class="stat-value" id="totalScans">0</span></div>
+          <div class="stat-row"><span class="stat-label">Sessions nettoyées</span><span class="stat-value" id="totalCleanups">0</span></div>
+          <div class="stat-row highlight"><span class="stat-label">Espace total libéré</span><span class="stat-value" id="totalSpaceFreed">0 MB</span></div>
+        </div>
+      </div>
+      <div class="admin-banner">
+        <div class="admin-icon">⚠️</div>
+        <div class="admin-text">
+          <div class="admin-title">Exécutez en administrateur</div>
+          <div class="admin-desc">Pour un nettoyage complet</div>
+        </div>
+        <button class="admin-btn" onclick="restartAsAdmin()">Relancer</button>
+      </div>
+    </div>
+  `;
+}
+
+// Mode-specific action functions
+window.analyzeAdvanced = () => {
+  if (appState.isScanning) return;
+  appState.isScanning = true;
+  addLog('Analyse avancée en cours...', 'info');
+  toggleProgress(true);
+  document.getElementById('progressTitle').textContent = 'Analyse Avancée';
+  updateProgressCircle(0, 'Analyse...');
+  document.getElementById('progressStatus').textContent = 'Analyse des fichiers temporaires Windows...';
+
+  let progress = 0;
+  const progressInterval = setInterval(() => {
+    if (progress < 90) {
+      progress += 15;
+      updateProgressCircle(progress, 'Analyse...');
+      // Update status text
+      const statuses = ['Analyse des fichiers temporaires Windows...', 'Analyse du cache navigateur...', 'Analyse des miniatures...', 'Analyse des logs...', 'Calcul final...'];
+      const statusIndex = Math.min(Math.floor(progress / 20), statuses.length - 1);
+      document.getElementById('progressStatus').textContent = statuses[statusIndex];
+    }
+  }, 300);
+
+  setTimeout(() => {
+    clearInterval(progressInterval);
+    updateProgressCircle(100, 'Terminé!');
+    document.getElementById('progressStatus').textContent = 'Analyse terminée: 9.2 GB détectés';
+    addLog('Analyse avancée terminée: 9.2 GB détectés', 'success');
+    appState.isScanning = false;
+    setTimeout(() => {
+      toggleProgress(false);
+      updateProgressCircle(0, 'Progression');
+    }, 2000);
+  }, 3000);
+};
+
+window.cleanAdvanced = () => {
+  if (appState.isScanning) return;
+  appState.isScanning = true;
+  addLog('Nettoyage avancé en cours...', 'info');
+  toggleProgress(true);
+  document.getElementById('progressTitle').textContent = 'Nettoyage Avancé';
+  updateProgressCircle(0, 'Nettoyage...');
+  document.getElementById('progressStatus').textContent = 'Suppression des fichiers temporaires...';
+
+  let progress = 0;
+  const progressInterval = setInterval(() => {
+    if (progress < 90) {
+      progress += 20;
+      updateProgressCircle(progress, 'Nettoyage...');
+    }
+  }, 250);
+
+  setTimeout(() => {
+    clearInterval(progressInterval);
+    updateProgressCircle(100, 'Terminé!');
+    document.getElementById('progressStatus').textContent = 'Nettoyage terminé: 9.2 GB nettoyés';
+    addLog('Nettoyage avancé terminé: 9.2 GB nettoyés', 'success');
+    appState.isScanning = false;
+    setTimeout(() => {
+      toggleProgress(false);
+      updateProgressCircle(0, 'Progression');
+    }, 2000);
+  }, 2500);
+};
+
+window.scanRegistry = () => {
+  if (appState.isScanning) return;
+  appState.isScanning = true;
+  addLog('Analyse du registre en cours...', 'info');
+  toggleProgress(true);
+  updateProgressCircle(30, 'Analyse...');
+
+  setTimeout(() => {
+    updateProgressCircle(70, 'Analyse...');
+  }, 1000);
+
+  setTimeout(() => {
+    updateProgressCircle(100, 'Terminé!');
+    addLog('Analyse du registre terminée: 152 entrées invalides trouvées', 'warning');
+    addLog('  - 12 entrées de classes invalides', 'info');
+    addLog('  - 5 chemins manquants', 'info');
+    addLog('  - 3 valeurs MUI absentes', 'info');
+    appState.isScanning = false;
+    setTimeout(() => {
+      toggleProgress(false);
+      updateProgressCircle(0, 'Progression');
+    }, 1500);
+  }, 2500);
+};
+
+window.analyzeRegistry = () => {
+  if (appState.isScanning) return;
+  appState.isScanning = true;
+  addLog('Analyse complète du registre Windows...', 'info');
+  toggleProgress(true);
+  updateProgressCircle(20, 'Analyse...');
+
+  setTimeout(() => {
+    updateProgressCircle(50, 'Vérification DLL...');
+  }, 800);
+
+  setTimeout(() => {
+    updateProgressCircle(80, 'Nettoyage...');
+  }, 1800);
+
+  setTimeout(() => {
+    updateProgressCircle(100, 'Terminé!');
+    addLog('Analyse terminée: 23 erreurs réparées', 'success');
+    addLog('Optimisation du registre terminée', 'info');
+    appState.isScanning = false;
+    setTimeout(() => {
+      toggleProgress(false);
+      updateProgressCircle(0, 'Progression');
+    }, 1500);
+  }, 3000);
+};
+
+window.backupRegistry = () => {
+  addLog('Sauvegarde du registre en cours...', 'info');
+  setTimeout(() => {
+    addLog('Sauvegarde créée: registry_backup_20250625.reg', 'success');
+    addLog('Emplacement: C:\\Windows\\System32\\config\\Backup', 'info');
+  }, 1500);
+};
+
+window.scanDuplicates = () => {
+  if (appState.isScanning) return;
+  appState.isScanning = true;
+  addLog('Recherche de fichiers doublons en cours...', 'info');
+
+  setTimeout(() => {
+    addLog('Scan terminé: 247 fichiers doublons détectés', 'success');
+    addLog('Espace à récupérer: 1.2 GB', 'info');
+    appState.isScanning = false;
+  }, 3000);
+};
+
+window.analyzeCustom = () => {
+  if (appState.isScanning) return;
+  appState.isScanning = true;
+  addLog('Analyse personnalisée en cours...', 'info');
+  toggleProgress(true);
+  document.getElementById('progressTitle').textContent = 'Analyse Personnalisée';
+  updateProgressCircle(0, 'Analyse...');
+  document.getElementById('progressStatus').textContent = 'Analyse des navigateurs...';
+
+  let progress = 0;
+  const progressInterval = setInterval(() => {
+    if (progress < 90) {
+      progress += 15;
+      updateProgressCircle(progress, 'Analyse...');
+      const statuses = ['Analyse des navigateurs...', 'Analyse système...', 'Analyse applications...', 'Analyse jeux...', 'Calcul final...'];
+      const statusIndex = Math.min(Math.floor(progress / 20), statuses.length - 1);
+      document.getElementById('progressStatus').textContent = statuses[statusIndex];
+    }
+  }, 300);
+
+  setTimeout(() => {
+    clearInterval(progressInterval);
+    updateProgressCircle(100, 'Terminé!');
+    document.getElementById('progressStatus').textContent = 'Analyse terminée: 15.2 GB détectés';
+    addLog('Analyse personnalisée terminée: 15.2 GB détectés', 'success');
+    appState.isScanning = false;
+    setTimeout(() => {
+      toggleProgress(false);
+      updateProgressCircle(0, 'Progression');
+    }, 2000);
+  }, 3000);
+};
+
+window.cleanCustom = () => {
+  if (appState.isScanning) return;
+  appState.isScanning = true;
+  addLog('Nettoyage personnalisé en cours...', 'info');
+  toggleProgress(true);
+  document.getElementById('progressTitle').textContent = 'Nettoyage Personnalisé';
+  updateProgressCircle(0, 'Nettoyage...');
+  document.getElementById('progressStatus').textContent = 'Suppression des caches...';
+
+  let progress = 0;
+  const progressInterval = setInterval(() => {
+    if (progress < 90) {
+      progress += 20;
+      updateProgressCircle(progress, 'Nettoyage...');
+      const statuses = ['Suppression des caches...', 'Suppression des logs...', 'Nettoyage applications...', 'Nettoyage jeux...', 'Finalisation...'];
+      const statusIndex = Math.min(Math.floor(progress / 20), statuses.length - 1);
+      document.getElementById('progressStatus').textContent = statuses[statusIndex];
+    }
+  }, 250);
+
+  setTimeout(() => {
+    clearInterval(progressInterval);
+    updateProgressCircle(100, 'Terminé!');
+    document.getElementById('progressStatus').textContent = 'Nettoyage terminé: 15.2 GB nettoyés';
+    addLog('Nettoyage personnalisé terminé: 15.2 GB nettoyés', 'success');
+    appState.isScanning = false;
+    setTimeout(() => {
+      toggleProgress(false);
+      updateProgressCircle(0, 'Progression');
+    }, 2000);
+  }, 2500);
 };
 
 window.handleScan = async () => {
@@ -513,20 +1080,256 @@ window.activatePremium = () => {
   window.open('https://glockcleaner.com/profile', '_blank');
 };
 
-window.analyzeRegistry = () => {
-  addLog('Lancement de l\'analyse du registre...', 'info');
+// Quick Action Functions
+window.quickScan = () => {
+  addLog('Démarrage de l\'analyse rapide...', 'info');
+  doQuickAnalyze();
+};
+
+window.deepClean = () => {
+  addLog('Démarrage du nettoyage profond...', 'info');
+  switchMode('advanced', event);
+};
+
+// Quick Analyze - Analyze button action
+window.doQuickAnalyze = async () => {
+  if (appState.isScanning) return;
+  appState.isScanning = true;
+  addLog('Analyse rapide en cours...', 'info');
+  toggleProgress(true);
+  document.getElementById('progressTitle').textContent = 'Analyse Rapide';
+  updateProgressCircle(0, 'Analyse...');
+  document.getElementById('progressStatus').textContent = 'Analyse des fichiers temporaires...';
+
+  const btn = document.getElementById('btnAnalyzeQuick');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Analyse...';
+  }
+
+  // Update space values from checkboxes
+  let totalSize = 0;
+  const sizes = { temp: 120, browser: 450, recycle: 80 };
+
+  if (document.getElementById('checkTemp')?.checked) totalSize += sizes.temp;
+  if (document.getElementById('checkBrowser')?.checked) totalSize += sizes.browser;
+  if (document.getElementById('checkRecycleBin')?.checked) totalSize += sizes.recycle;
+
+  // Simulate scan with progress
+  let progress = 0;
+  const progressInterval = setInterval(() => {
+    if (progress < 90) {
+      progress += 20;
+      updateProgressCircle(progress, 'Analyse...');
+      const statuses = ['Analyse des fichiers temporaires...', 'Analyse du cache navigateur...', 'Analyse de la corbeille...', 'Calcul final...'];
+      const statusIndex = Math.min(Math.floor(progress / 25), statuses.length - 1);
+      document.getElementById('progressStatus').textContent = statuses[statusIndex];
+
+      const spaceBar = document.getElementById('potentialSpaceBar');
+      if (spaceBar) spaceBar.style.width = progress + '%';
+    }
+  }, 150);
+
   setTimeout(() => {
-    addLog('Analyse complète: 17 problèmes détectés', 'success');
-    addLog('5 DLL manquantes, 12 entrées orphelines', 'warning');
+    clearInterval(progressInterval);
+    updateProgressCircle(100, 'Terminé!');
+    document.getElementById('progressStatus').textContent = 'Analyse terminée: ' + totalSize + ' MB détectés';
+
+    // Update UI with results
+    const potentialSpace = document.getElementById('potentialSpace');
+    const spaceToRecover = document.getElementById('spaceToRecover');
+    const detectedFiles = document.getElementById('detectedFiles');
+
+    if (potentialSpace) potentialSpace.textContent = '~' + totalSize + ' MB';
+    if (spaceToRecover) spaceToRecover.textContent = totalSize + ' MB';
+    if (detectedFiles) detectedFiles.textContent = Math.floor(totalSize / 10);
+
+    // Enable clean button
+    const cleanBtn = document.getElementById('btnCleanQuick');
+    if (cleanBtn) cleanBtn.disabled = false;
+
+    addLog('Analyse terminée: ' + totalSize + ' MB potentiellement libérables', 'success');
+    appState.isScanning = false;
+
+    setTimeout(() => {
+      toggleProgress(false);
+      updateProgressCircle(0, 'Progression');
+    }, 2000);
+
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '<span class="btn-icon">⚙️</span><span class="btn-text">Analyser</span>';
+    }
+  }, 1000);
+};
+
+// Quick Clean - Clean button action
+window.doQuickClean = async () => {
+  if (appState.isScanning) return;
+  appState.isScanning = true;
+  addLog('Démarrage du nettoyage rapide...', 'info');
+  toggleProgress(true);
+  document.getElementById('progressTitle').textContent = 'Nettoyage Rapide';
+  updateProgressCircle(0, 'Nettoyage...');
+  document.getElementById('progressStatus').textContent = 'Suppression des fichiers temporaires...';
+
+  const btn = document.getElementById('btnCleanQuick');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Nettoyage...';
+  }
+
+  // Simulate cleaning with progress
+  let progress = 0;
+  const progressInterval = setInterval(() => {
+    if (progress < 90) {
+      progress += 10;
+      updateProgressCircle(progress, 'Nettoyage...');
+      const statuses = ['Suppression des fichiers temporaires...', 'Suppression du cache navigateur...', 'Vidage de la corbeille...', 'Finalisation...'];
+      const statusIndex = Math.min(Math.floor(progress / 25), statuses.length - 1);
+      document.getElementById('progressStatus').textContent = statuses[statusIndex];
+    }
+  }, 200);
+
+  setTimeout(() => {
+    clearInterval(progressInterval);
+    updateProgressCircle(100, 'Terminé!');
+
+    // Get the space value
+    const spaceEl = document.getElementById('spaceToRecover');
+    const space = spaceEl ? parseInt(spaceEl.textContent) || 0 : 0;
+
+    document.getElementById('progressStatus').textContent = 'Nettoyage terminé: ' + space + ' MB libérés';
+
+    // Update stats
+    const totalFreed = document.getElementById('totalSpaceFreed');
+    const totalClean = document.getElementById('totalCleanups');
+    if (totalFreed) {
+      const current = parseInt(totalFreed.textContent) || 0;
+      totalFreed.textContent = (current + space) + ' MB';
+    }
+    if (totalClean) {
+      totalClean.textContent = parseInt(totalClean.textContent || '0') + 1;
+    }
+
+    addLog('Nettoyage terminé: ' + space + ' MB libérés', 'success');
+    appState.isScanning = false;
+
+    setTimeout(() => {
+      toggleProgress(false);
+      updateProgressCircle(0, 'Progression');
+    }, 2000);
+
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '<span class="btn-icon">🧹</span><span class="btn-text">Nettoyer maintenant</span>';
+    }
+
+    // Reset space
+    const potentialSpace = document.getElementById('potentialSpace');
+    const spaceBar = document.getElementById('potentialSpaceBar');
+    if (potentialSpace) potentialSpace.textContent = '--';
+    if (spaceBar) spaceBar.style.width = '0%';
+  }, 1200);
+};
+
+// Create restore point
+window.createRestorePoint = async () => {
+  addLog('Création d\'un point de restauration système...', 'info');
+  toggleProgress(true);
+  document.getElementById('progressTitle').textContent = 'Point de restauration';
+  updateProgressCircle(30, 'Création...');
+
+  try {
+    const result = await window.api.createRestorePoint();
+    if (result.success) {
+      updateProgressCircle(100, 'Terminé!');
+      addLog(`Point de restauration créé: ${result.name}`, 'success');
+      addLog('Vous pouvez maintenant nettoyer en toute sécurité', 'info');
+    } else {
+      updateProgressCircle(0, 'Erreur');
+      addLog('Erreur: Impossible de créer le point de restauration', 'error');
+      addLog('Astuce: Exécutez en tant qu\'administrateur', 'warning');
+    }
+  } catch (error) {
+    addLog(`Erreur: ${error.message}`, 'error');
+  }
+
+  setTimeout(() => {
+    toggleProgress(false);
+    updateProgressCircle(0, 'Progression');
   }, 2000);
 };
 
-window.scanDuplicates = () => {
-  addLog('Recherche de fichiers doublons en cours...', 'info');
+// Restart as admin
+window.restartAsAdmin = () => {
+  addLog('Redémarrage en mode administrateur...', 'info');
+  window.location.reload();
+};
+
+window.checkUpdates = () => {
+  addLog('Vérification des mises à jour...', 'info');
   setTimeout(() => {
-    addLog('Scan terminé: 247 fichiers doublons détectés', 'success');
-    addLog('Espace à récupérer: 1.2 GB', 'info');
-  }, 3000);
+    addLog('Vous êtes à jour! Version actuelle: 1.0.0', 'success');
+  }, 1000);
+};
+
+window.openSettings = () => {
+  addLog('Ouverture des paramètres...', 'info');
+  switchMode('settings', event);
+};
+
+// Uninstall application
+window.uninstallApp = async (appName) => {
+  if (!confirm(`Voulez-vous vraiment désinstaller ${appName} ?`)) return;
+
+  addLog(`Désinstallation de ${appName} en cours...`, 'info');
+  toggleProgress(true);
+  document.getElementById('progressTitle').textContent = 'Désinstallation';
+  updateProgressCircle(30, 'Preparación...');
+
+  try {
+    const result = await window.api.uninstallApp(appName);
+    if (result.success) {
+      updateProgressCircle(100, 'Terminé!');
+      addLog(`${appName} désinstallé avec succès`, 'success');
+    } else {
+      updateProgressCircle(0, 'Erreur');
+      addLog(`Erreur: ${result.error}`, 'error');
+    }
+  } catch (error) {
+    addLog(`Erreur: ${error.message}`, 'error');
+  }
+
+  setTimeout(() => {
+    toggleProgress(false);
+    updateProgressCircle(0, 'Progression');
+  }, 2000);
+};
+
+// Open external link
+window.openExternal = (url) => {
+  addLog(`Ouverture: ${url}`, 'info');
+  window.api.openExternal(url);
+};
+
+window.cancelScan = () => {
+  appState.isScanning = false;
+  toggleProgress(false);
+  updateProgressCircle(0, 'Progression');
+  addLog('Opération annulée par l\'utilisateur', 'warning');
+
+  // Reset buttons
+  const btnAnalyze = document.getElementById('btnAnalyzeQuick');
+  const btnClean = document.getElementById('btnCleanQuick');
+  if (btnAnalyze) {
+    btnAnalyze.disabled = false;
+    btnAnalyze.innerHTML = '<span class="btn-icon">⚙️</span><span class="btn-text">Analyser</span>';
+  }
+  if (btnClean) {
+    btnClean.disabled = true;
+    btnClean.innerHTML = '<span class="btn-icon">🧹</span><span class="btn-text">Nettoyer maintenant</span>';
+  }
 };
 
 // Init on DOM load

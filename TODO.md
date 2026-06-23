@@ -1,3 +1,0 @@
-- [x] Mettre à jour `window.activatePremium` dans `renderer/index.js` pour rediriger vers `https://glockcleaner.com/profile`
-- [x] Vérifier que les boutons Premium utilisent bien `activatePremium()`
-- [x] Marquer les tâches comme terminées

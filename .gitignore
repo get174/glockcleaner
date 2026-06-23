@@ -29,3 +29,8 @@ out/
 # Environnement
 .env
 .env.local
+
+# Build artifacts (NSIS)
+nsis/*.exe
+nsis/*.blockmap
+nsis/win-unpacked/

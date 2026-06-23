@@ -154,6 +154,59 @@ ipcMain.handle('update-config', async (event, newConfig) => {
   return appConfig;
 });
 
+// ✅ Créer un point de restauration système
+ipcMain.handle('create-restore-point', async () => {
+  const restoreName = `GLOCK_Cleaner_${new Date().toISOString().replace(/[:.]/g, '-')}`;
+  const psScript = `checkpoint-computer -restorepointname "${restoreName}" -description "GLOCK Cleaner - Nettoyage PC"`;
+
+  try {
+    execSync(`powershell -Command "${psScript}"`, { stdio: 'pipe', shell: 'cmd.exe' });
+    return { success: true, name: restoreName };
+  } catch (e) {
+    console.error('Restore point error:', e);
+    return { success: false, error: e.message };
+  }
+});
+
+// ✅ Ouvrir un lien externe
+const { shell } = require('electron');
+ipcMain.handle('open-external', async (event, url) => {
+  try {
+    await shell.openExternal(url);
+    return { success: true };
+  } catch (e) {
+    return { success: false, error: e.message };
+  }
+});
+
+// ✅ Désinstaller une application
+ipcMain.handle('uninstall-app', async (event, appName) => {
+  const uninstallCommands = {
+    'Adobe Reader': 'Adobe Acrobat',
+    'VLC': '*VLC*',
+    '7-Zip': '7-Zip',
+    'Notepad++': 'Notepad++'
+  };
+
+  const package = uninstallCommands[appName];
+  if (!package) return { success: false, error: 'Application non trouvée' };
+
+  try {
+    // Trouver le package uninstallstring
+    const psScript = `Get-WmiObject -Class Win32_Product | Where-Object {$_.Name -like "*${package}*"} | Select-Object -First 1 -ExpandProperty UninstallString`;
+    const uninstallStr = execSync(`powershell -Command "${psScript}"`, { encoding: 'utf-8', shell: 'cmd.exe' }).trim();
+
+    if (uninstallStr) {
+      execSync(uninstallStr, { stdio: 'pipe', shell: 'cmd.exe' });
+      return { success: true, name: appName };
+    }
+    return { success: false, error: 'Désinstalleur non trouvé' };
+  } catch (e) {
+    console.error('Uninstall error:', e);
+    return { success: false, error: e.message };
+  }
+});
+
 // ✅ Scan avec config
 ipcMain.handle('scan', async () => {
   const paths = appConfig.cleaningPaths.filter(p => fs.existsSync(p));

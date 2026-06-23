@@ -1,0 +1,16 @@
+directories:
+  output: nsis
+  buildResources: build
+appId: com.get174.glockcleaner
+productName: GlockCleaner
+files:
+  - filter:
+      - '**/*'
+      - '!dist/**/*'
+win:
+  target: nsis
+  icon: assets/icon.png
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+electronVersion: 41.5.1
