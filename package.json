@@ -1,6 +1,6 @@
 {
   "name": "glockcleaner",
-  "version": "1.1.1",
+  "version": "1.1.0",
   "description": "Application de nettoyage PC pour Windows - Version améliorée",
   "main": "main.js",
   "scripts": {
@@ -56,6 +56,12 @@
       "provider": "github",
       "owner": "get174",
       "repo": "glockcleaner"
-    }
+    },
+    "extraResources": [
+  {
+    "from": "assets",
+    "to": "assets"
+  }
+    ]
   }
 }
