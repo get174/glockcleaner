@@ -4,6 +4,7 @@ const os = require('os');
 const fs = require('fs-extra');
 const config = require('./config.js'); // ✅ INTÉGRATION CONFIG
 const { execSync } = require('child_process');
+const { autoUpdater } = require('electron-updater');
 
 let mainWindow;
 let isAdmin = false;
@@ -41,6 +42,46 @@ function createWindow() {
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
+
+  // Configurer autoUpdater
+  autoUpdater.autoDownload = false;
+  autoUpdater.autoInstallOnAppQuit = true;
+
+  // Gérer les événements de mise à jour
+  autoUpdater.on('checking-for-update', () => {
+    console.log('Checking for updates...');
+    mainWindow.webContents.send('update-status', { status: 'checking' });
+  });
+
+  autoUpdater.on('update-available', (info) => {
+    console.log('Update available:', info.version);
+    mainWindow.webContents.send('update-status', { status: 'available', version: info.version });
+    autoUpdater.downloadUpdate();
+  });
+
+  autoUpdater.on('update-not-available', () => {
+    console.log('No updates available');
+    mainWindow.webContents.send('update-status', { status: 'not-available' });
+  });
+
+  autoUpdater.on('download-progress', (progress) => {
+    mainWindow.webContents.send('update-status', { status: 'downloading', percent: progress.percent });
+  });
+
+  autoUpdater.on('update-downloaded', (info) => {
+    console.log('Update downloaded:', info.version);
+    mainWindow.webContents.send('update-status', { status: 'downloaded', version: info.version });
+  });
+
+  autoUpdater.on('error', (err) => {
+    console.error('Update error:', err);
+    mainWindow.webContents.send('update-status', { status: 'error', error: err.message });
+  });
+
+  // Vérifier les mises à jour au démarrage
+  if (app.isPackaged) {
+    autoUpdater.checkForUpdatesAndNotify();
+  }
 }
 
 // Fonction utilitaire: mapper catégorie → paths
@@ -152,6 +193,23 @@ ipcMain.handle('update-config', async (event, newConfig) => {
   // Sauvegarder (simple pour démo)
   console.log('Config updated:', appConfig);
   return appConfig;
+});
+
+// ✅ IPC pour gérer les mises à jour
+ipcMain.handle('check-for-updates', async () => {
+  if (!app.isPackaged) {
+    return { success: false, error: 'Updates only work in packaged app' };
+  }
+  try {
+    await autoUpdater.checkForUpdatesAndNotify();
+    return { success: true };
+  } catch (e) {
+    return { success: false, error: e.message };
+  }
+});
+
+ipcMain.handle('install-update', () => {
+  autoUpdater.quitAndInstall();
 });
 
 // ✅ Créer un point de restauration système

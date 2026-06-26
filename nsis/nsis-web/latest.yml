@@ -1,0 +1,14 @@
+version: 1.1.1
+files:
+  - url: GlockCleaner-Web-Setup-1.1.1.exe
+    sha512: LYYT/Qc99nYN81qr5j5N+XDp/JPdTW1qGLUjwmlZLhqqrQUqueWMlmQ6t7byr5On0huPz+NqgG4Zz/eVe1oMGQ==
+path: GlockCleaner-Web-Setup-1.1.1.exe
+sha512: LYYT/Qc99nYN81qr5j5N+XDp/JPdTW1qGLUjwmlZLhqqrQUqueWMlmQ6t7byr5On0huPz+NqgG4Zz/eVe1oMGQ==
+packages:
+  x64:
+    size: 97272223
+    sha512: 24hoSZJyKAcqZe5xxWQKNoUs76JxQKeaWBsnsD1/d/lv73A8I7DayMOeF8X7uWnJRQv7K6I5itaFI21sZeqHwQ==
+    blockMapSize: 103152
+    path: glockcleaner-1.1.1-x64.nsis.7z
+    file: glockcleaner-1.1.1-x64.nsis.7z
+releaseDate: '2026-06-26T00:52:59.362Z'

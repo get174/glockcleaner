@@ -8,9 +8,17 @@ files:
       - '**/*'
       - '!dist/**/*'
 win:
-  target: nsis
-  icon: assets/icon.png
+  target: nsis-web
+  icon: build/installerIcon.ico
 nsis:
   oneClick: false
   allowToChangeInstallationDirectory: true
+  installerIcon: build/installerIcon.ico
+  installerSidebar: build/installerSidebar.bmp
+  installerHeader: build/installerHeader.bmp
+  uninstallerSidebar: build/uninstallerSidebar.bmp
+publish:
+  provider: github
+  owner: get174
+  repo: glockcleaner
 electronVersion: 41.5.1
