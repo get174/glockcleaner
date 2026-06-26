@@ -46,10 +46,10 @@
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
-      "installerIcon": "build/installerIcon.ico",
-      "installerSidebar": "build/installerSidebar.bmp",
-      "installerHeader": "build/installerHeader.bmp",
-      "uninstallerSidebar": "build/uninstallerSidebar.bmp"
+      "installerIcon": "assets/installerIcon.ico",
+      "installerSidebar": "assets/installerSidebar.bmp",
+      "installerHeader": "assets/installerHeader.bmp",
+      "uninstallerSidebar": "assets/uninstallerSidebar.bmp"
       
     },
     "publish": {
