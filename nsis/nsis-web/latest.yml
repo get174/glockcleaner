@@ -1,14 +1,14 @@
-version: 1.1.1
+version: 1.1.0
 files:
-  - url: GlockCleaner-Web-Setup-1.1.1.exe
-    sha512: 6PpuCEcwyq7fap9NZH5uVkemRZjCyeWhTFN/DO2zNtaFK4rYn6MyuSpncIeG8M0uDYbpaV11qGEbxCntQn17hA==
-path: GlockCleaner-Web-Setup-1.1.1.exe
-sha512: 6PpuCEcwyq7fap9NZH5uVkemRZjCyeWhTFN/DO2zNtaFK4rYn6MyuSpncIeG8M0uDYbpaV11qGEbxCntQn17hA==
+  - url: GlockCleaner-Web-Setup-1.1.0.exe
+    sha512: 1MZj8RSL4iqzmfq3PuEDkx9in5i/Q6iitbMFJp/LGqvRcybB14Oimdal/bn3gSa7QmaJPJlukhSlzPFrCWtdZQ==
+path: GlockCleaner-Web-Setup-1.1.0.exe
+sha512: 1MZj8RSL4iqzmfq3PuEDkx9in5i/Q6iitbMFJp/LGqvRcybB14Oimdal/bn3gSa7QmaJPJlukhSlzPFrCWtdZQ==
 packages:
   x64:
-    size: 97272223
-    sha512: 24hoSZJyKAcqZe5xxWQKNoUs76JxQKeaWBsnsD1/d/lv73A8I7DayMOeF8X7uWnJRQv7K6I5itaFI21sZeqHwQ==
-    blockMapSize: 103152
-    path: glockcleaner-1.1.1-x64.nsis.7z
-    file: glockcleaner-1.1.1-x64.nsis.7z
-releaseDate: '2026-06-26T01:06:13.959Z'
+    size: 97647090
+    sha512: nZXzZ+1MNx3qJZXQgEGam+q9mh1P4guB/uUWXl+uwZnvQZmGQC4m0gbT4Qm8cbXmzdVb055EFb0VwZxj+9d0kg==
+    blockMapSize: 103633
+    path: glockcleaner-1.1.0-x64.nsis.7z
+    file: glockcleaner-1.1.0-x64.nsis.7z
+releaseDate: '2026-06-26T01:28:36.898Z'

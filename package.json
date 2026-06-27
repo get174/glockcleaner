@@ -21,7 +21,7 @@
   "author": "Glok Team",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^41.0.1",
+    "electron": "^42.5.0",
     "electron-builder": "^26.15.3"
   },
   "dependencies": {
@@ -41,7 +41,6 @@
     "win": {
       "target": "nsis-web",
       "icon": "build/installerIcon.ico"
-      
     },
     "nsis": {
       "oneClick": false,
@@ -50,7 +49,6 @@
       "installerSidebar": "assets/installerSidebar.bmp",
       "installerHeader": "assets/installerHeader.bmp",
       "uninstallerSidebar": "assets/uninstallerSidebar.bmp"
-      
     },
     "publish": {
       "provider": "github",
@@ -58,10 +56,10 @@
       "repo": "glockcleaner"
     },
     "extraResources": [
-  {
-    "from": "assets",
-    "to": "assets"
-  }
+      {
+        "from": "assets",
+        "to": "assets"
+      }
     ]
   }
 }

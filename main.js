@@ -4,7 +4,9 @@ const os = require('os');
 const fs = require('fs-extra');
 const config = require('./config.js'); // ✅ INTÉGRATION CONFIG
 const { execSync } = require('child_process');
-const { autoUpdater } = require('electron-updater');
+
+// Auto updater - loaded lazily to fix Node.js v24 compatibility
+let autoUpdater = null;
 
 let mainWindow;
 let isAdmin = false;
@@ -22,6 +24,16 @@ function checkAdminRights() {
 
 // Créer la fenêtre principale
 function createWindow() {
+  // Lazy load autoUpdater after app is ready
+  if (!autoUpdater) {
+    try {
+      autoUpdater = require('electron-updater').autoUpdater;
+    } catch (e) {
+      console.log('autoUpdater not available:', e.message);
+      autoUpdater = null;
+    }
+  }
+
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
@@ -43,44 +55,46 @@ function createWindow() {
     mainWindow = null;
   });
 
-  // Configurer autoUpdater
-  autoUpdater.autoDownload = false;
-  autoUpdater.autoInstallOnAppQuit = true;
+  // Configurer autoUpdater seulement s'il est disponible
+  if (autoUpdater) {
+    autoUpdater.autoDownload = false;
+    autoUpdater.autoInstallOnAppQuit = true;
 
-  // Gérer les événements de mise à jour
-  autoUpdater.on('checking-for-update', () => {
-    console.log('Checking for updates...');
-    mainWindow.webContents.send('update-status', { status: 'checking' });
-  });
+    // Gérer les événements de mise à jour
+    autoUpdater.on('checking-for-update', () => {
+      console.log('Checking for updates...');
+      mainWindow.webContents.send('update-status', { status: 'checking' });
+    });
 
-  autoUpdater.on('update-available', (info) => {
-    console.log('Update available:', info.version);
-    mainWindow.webContents.send('update-status', { status: 'available', version: info.version });
-    autoUpdater.downloadUpdate();
-  });
+    autoUpdater.on('update-available', (info) => {
+      console.log('Update available:', info.version);
+      mainWindow.webContents.send('update-status', { status: 'available', version: info.version });
+      autoUpdater.downloadUpdate();
+    });
 
-  autoUpdater.on('update-not-available', () => {
-    console.log('No updates available');
-    mainWindow.webContents.send('update-status', { status: 'not-available' });
-  });
+    autoUpdater.on('update-not-available', () => {
+      console.log('No updates available');
+      mainWindow.webContents.send('update-status', { status: 'not-available' });
+    });
 
-  autoUpdater.on('download-progress', (progress) => {
-    mainWindow.webContents.send('update-status', { status: 'downloading', percent: progress.percent });
-  });
+    autoUpdater.on('download-progress', (progress) => {
+      mainWindow.webContents.send('update-status', { status: 'downloading', percent: progress.percent });
+    });
 
-  autoUpdater.on('update-downloaded', (info) => {
-    console.log('Update downloaded:', info.version);
-    mainWindow.webContents.send('update-status', { status: 'downloaded', version: info.version });
-  });
+    autoUpdater.on('update-downloaded', (info) => {
+      console.log('Update downloaded:', info.version);
+      mainWindow.webContents.send('update-status', { status: 'downloaded', version: info.version });
+    });
 
-  autoUpdater.on('error', (err) => {
-    console.error('Update error:', err);
-    mainWindow.webContents.send('update-status', { status: 'error', error: err.message });
-  });
+    autoUpdater.on('error', (err) => {
+      console.error('Update error:', err);
+      mainWindow.webContents.send('update-status', { status: 'error', error: err.message });
+    });
 
-  // Vérifier les mises à jour au démarrage
-  if (app.isPackaged) {
-    autoUpdater.checkForUpdatesAndNotify();
+    // Vérifier les mises à jour au démarrage
+    if (app.isPackaged) {
+      autoUpdater.checkForUpdatesAndNotify();
+    }
   }
 }
 
@@ -200,6 +214,9 @@ ipcMain.handle('check-for-updates', async () => {
   if (!app.isPackaged) {
     return { success: false, error: 'Updates only work in packaged app' };
   }
+  if (!autoUpdater) {
+    return { success: false, error: 'Auto updater not available' };
+  }
   try {
     await autoUpdater.checkForUpdatesAndNotify();
     return { success: true };
@@ -209,7 +226,9 @@ ipcMain.handle('check-for-updates', async () => {
 });
 
 ipcMain.handle('install-update', () => {
-  autoUpdater.quitAndInstall();
+  if (autoUpdater) {
+    autoUpdater.quitAndInstall();
+  }
 });
 
 // ✅ Créer un point de restauration système
@@ -346,5 +365,75 @@ ipcMain.handle('getDiskInfo', async () => {
       blockSize: 1024,
     };
   }
+});
+
+// Gestion des licences et abonnements
+const licenseFile = path.join(app.getPath('userData'), 'license.json');
+
+function loadLicense() {
+  try {
+    if (fs.existsSync(licenseFile)) {
+      return JSON.parse(fs.readFileSync(licenseFile, 'utf-8'));
+    }
+  } catch (e) {}
+  return { tier: 'free', key: null, expireDate: null };
+}
+
+function saveLicense(license) {
+  fs.writeFileSync(licenseFile, JSON.stringify(license, null, 2));
+}
+
+ipcMain.handle('check-license-format', async (event, key) => {
+  // Vérifie le format de la clé (format attendu: GLOCK-XXXX-XXXX-XXXX)
+  const format = /^[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/i;
+  return format.test(key);
+});
+
+ipcMain.handle('activate-license', async (event, key) => {
+  try {
+    // Accepter plusieurs formats de clés
+    const format1 = /^[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/i;
+    const format2 = /^[A-Z0-9]{4}-[A-Z0-9]{1,2}-[A-Z0-9]{1,2}-[A-Z0-9]{2,4}$/i;
+    const format3 = /^[A-Z0-9]+$/i;
+
+    if (!format1.test(key) && !format2.test(key) && !format3.test(key)) {
+      return { success: false, error: 'Format de clé invalide' };
+    }
+
+    // Clés valides simulées (à remplacer par une vérification serveur en production)
+    const validKeys = {
+      'GLOC-PREM-9-9-99': { tier: 'premium', days: 365 },
+      'GLOC-PRO-1-9-99': { tier: 'pro', days: 365 },
+      'GLOC-LIFE-TIME': { tier: 'pro', days: null }
+    };
+
+    const keyData = validKeys[key.toUpperCase()];
+    if (keyData) {
+      const expireDate = keyData.days ? new Date(Date.now() + keyData.days * 24 * 60 * 60 * 1000).toISOString() : null;
+      const license = { tier: keyData.tier, key: key.toUpperCase(), expireDate };
+      saveLicense(license);
+      return { success: true, tier: keyData.tier, expireDate };
+    }
+
+    // Clé d'évaluation pour les tests
+    if (key.startsWith('TEST-')) {
+      const license = { tier: 'premium', key: key.toUpperCase(), expireDate: null };
+      saveLicense(license);
+      return { success: true, tier: 'premium', expireDate: null };
+    }
+
+    return { success: false, error: 'Clé de licence invalide' };
+  } catch (e) {
+    return { success: false, error: 'Erreur lors de l\'activation: ' + e.message };
+  }
+});
+
+ipcMain.handle('get-subscription', async () => {
+  const license = loadLicense();
+  return {
+    tier: license.tier || 'free',
+    expireDate: license.expireDate,
+    key: license.key
+  };
 });
 

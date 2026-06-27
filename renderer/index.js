@@ -423,6 +423,11 @@ window.switchMode = async (mode, event) => {
   if (contentArea) {
     contentArea.innerHTML = getModeScreen(mode);
   }
+
+  // Attach license events after render
+  if (mode === 'settings') {
+    attachLicenseEvents();
+  }
 };
 
 // Get screen HTML for each mode
@@ -601,6 +606,57 @@ function getModeScreen(mode) {
     settings: `
       ${getDashboardHeader()}
       <div class="settings-section">
+        <div class="settings-group subscription-group">
+          <div class="group-title">Mon abonnement</div>
+          <div class="subscription-status">
+            <div class="sub-status">
+              <span class="sub-label">Statut:</span>
+              <span class="sub-value active" id="subStatusValue">Version gratuite</span>
+            </div>
+            <div class="sub-status">
+              <span class="sub-label">Expire le:</span>
+              <span class="sub-value" id="subExpireValue">-</span>
+            </div>
+          </div>
+          <div class="license-input-section">
+            <input type="text" id="licenseKeyInput" placeholder="Entrez votre clé de licence">
+            <button class="btn-activate" id="activateLicenseBtn" onclick="alert('CLICK TEST')">Activer</button>
+          </div>
+          <div class="subscription-plans">
+            <div class="plan-card free">
+              <div class="plan-name">Gratuit</div>
+              <div class="plan-price">0€</div>
+              <div class="plan-features">
+                <div>Nettoyage rapide</div>
+                <div>Analyse basique</div>
+              </div>
+              <div class="plan-current">Actuel</div>
+            </div>
+            <div class="plan-card premium">
+              <div class="plan-badge">POPULAIRE</div>
+              <div class="plan-name">Premium</div>
+              <div class="plan-price">9.99€/an</div>
+              <div class="plan-features">
+                <div>Nettoyage illimité</div>
+                <div>Analyse avancée</div>
+                <div>Priorité support</div>
+                <div>Sans publicité</div>
+              </div>
+              <button class="btn-upgrade" onclick="upgradeToPremium()">Passer à Premium</button>
+            </div>
+            <div class="plan-card pro">
+              <div class="plan-name">Pro</div>
+              <div class="plan-price">19.99€/an</div>
+              <div class="plan-features">
+                <div>Tout Premium</div>
+                <div>Export données</div>
+                <div>API access</div>
+                <div>Support dédié</div>
+              </div>
+              <button class="btn-upgrade" onclick="upgradeToPro()">Passer à Pro</button>
+            </div>
+          </div>
+        </div>
         <div class="settings-group">
           <div class="group-title">Général</div>
           <label class="setting-item"><span>Lancer au démarrage</span><input type="checkbox"></label>
@@ -1080,6 +1136,91 @@ window.activatePremium = () => {
   window.open('https://glockcleaner.com/profile', '_blank');
 };
 
+// License and Subscription Functions
+function attachLicenseEvents() {
+  setTimeout(() => {
+    const activateBtn = document.getElementById('activateLicenseBtn');
+    if (activateBtn) {
+      activateBtn.onclick = activateLicense;
+    }
+  }, 100);
+}
+
+// Also make it a global function
+function activateLicense() {
+  console.log('=== ACTIVATE LICENSE CLICKED ===');
+  addLog('Activation en cours...', 'info');
+  const input = document.getElementById('licenseKeyInput');
+  if (!input) {
+    console.error('licenseKeyInput not found');
+    addLog('Erreur: input non trouvé', 'error');
+    return;
+  }
+  const key = input.value.trim();
+
+  if (!key) {
+    addLog('Veuillez entrer une clé de licence', 'error');
+    return;
+  }
+
+  addLog('Vérification de la clé: ' + key, 'info');
+
+  window.api.activateLicense(key).then((result) => {
+    if (result.success) {
+      addLog(`Licence activée avec succès! Tier: ${result.tier}`, 'success');
+      updateSubscriptionUI(result.tier, result.expireDate);
+    } else {
+      addLog(`Erreur: ${result.error}`, 'error');
+    }
+  }).catch((e) => {
+    addLog('Erreur lors de l\'activation: ' + e.message, 'error');
+  });
+}
+
+// Expose globally
+window.activateLicense = activateLicense;
+
+window.upgradeToPremium = () => {
+  addLog('Ouverture de la page Premium...', 'info');
+  window.open('https://glockcleaner.com/premium', '_blank');
+};
+
+window.upgradeToPro = () => {
+  addLog('Ouverture de la page Pro...', 'info');
+  window.open('https://glockcleaner.com/pro', '_blank');
+};
+
+function updateSubscriptionUI(tier, expireDate) {
+  const statusEl = document.getElementById('subStatusValue');
+  const expireEl = document.getElementById('subExpireValue');
+
+  if (statusEl) {
+    statusEl.textContent = tier === 'free' ? 'Version gratuite' :
+                       tier === 'premium' ? 'Premium' : 'Pro';
+    statusEl.className = 'sub-value ' + (tier !== 'free' ? 'active' : '');
+  }
+
+  if (expireEl) {
+    if (expireDate) {
+      const date = new Date(expireDate);
+      expireEl.textContent = date.toLocaleDateString();
+    } else if (tier === 'pro') {
+      expireEl.textContent = 'Illimité';
+    } else {
+      expireEl.textContent = '-';
+    }
+  }
+}
+
+async function loadSubscriptionStatus() {
+  try {
+    const sub = await window.api.getSubscription();
+    updateSubscriptionUI(sub.tier, sub.expireDate);
+  } catch (e) {
+    console.error('Erreur chargement abonnement:', e);
+  }
+}
+
 // Quick Action Functions
 window.quickScan = () => {
   addLog('Démarrage de l\'analyse rapide...', 'info');
@@ -1350,9 +1491,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       adminCard.innerHTML = '<div class="status-dot" style="background:var(--warning-color);"></div><div class="status-text">Redémarrez en tant qu\'administrateur</div>';
     }
     
+    // Load subscription status
+    await loadSubscriptionStatus();
+
     // Default mode - directly call switchMode
     window.switchMode('overview', null);
-    
+
   } catch (error) {
     addLog(`Init erreur: ${error.message}`, 'error');
   }

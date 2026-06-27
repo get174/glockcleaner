@@ -38,5 +38,10 @@ contextBridge.exposeInMainWorld('api', {
   offCleanProgress: () => {
     ipcRenderer.removeAllListeners('clean-progress');
   },
+
+  // Licence et abonnement
+  activateLicense: (key) => ipcRenderer.invoke('activate-license', key),
+  getSubscription: () => ipcRenderer.invoke('get-subscription'),
+  checkLicenseFormat: (key) => ipcRenderer.invoke('check-license-format', key),
 });
 
