@@ -1907,6 +1907,36 @@
       border-color: var(--accent-color);
     }
 
+    .license-message {
+      padding: 12px 15px;
+      margin-top: 10px;
+      border-radius: 8px;
+      font-size: 0.9em;
+      text-align: center;
+      display: none;
+    }
+
+    .license-message.info {
+      display: block;
+      background: rgba(0, 212,255, 0.15);
+      color: #00d4ff;
+      border: 1px solid rgba(0,212,255,0.3);
+    }
+
+    .license-message.success {
+      display: block;
+      background: rgba(0,255,136,0.15);
+      color: #00ff88;
+      border: 1px solid rgba(0,255,136,0.3);
+    }
+
+    .license-message.error {
+      display: block;
+      background: rgba(255,68,68,0.15);
+      color: #ff4444;
+      border: 1px solid rgba(255,68,68,0.3);
+    }
+
     .btn-activate {
       padding: 12px 20px;
       background: linear-gradient(135deg, var(--accent-color), #0097ff);
@@ -1925,7 +1955,7 @@
 
     .subscription-plans {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 15px;
       padding: 20px;
     }
@@ -1948,6 +1978,16 @@
     .plan-card.premium {
       border-color: var(--accent-color);
       background: linear-gradient(145deg, var(--secondary-color), rgba(0, 212, 255, 0.1));
+    }
+
+    .plan-card.professional {
+      border-color: #9b59b6;
+      background: linear-gradient(145deg, var(--secondary-color), rgba(155, 89, 182, 0.1));
+    }
+
+    .plan-card.pro-plus {
+      border-color: #e74c3c;
+      background: linear-gradient(145deg, var(--secondary-color), rgba(231, 76, 60, 0.15));
     }
 
     .plan-badge {

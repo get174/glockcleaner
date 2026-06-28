@@ -620,8 +620,9 @@ function getModeScreen(mode) {
           </div>
           <div class="license-input-section">
             <input type="text" id="licenseKeyInput" placeholder="Entrez votre clé de licence">
-            <button class="btn-activate" id="activateLicenseBtn" onclick="alert('CLICK TEST')">Activer</button>
+            <button class="btn-activate" id="activateLicenseBtn" style="background:red;">Activer</button>
           </div>
+          <div class="license-message" id="licenseMessage"></div>
           <div class="subscription-plans">
             <div class="plan-card free">
               <div class="plan-name">Gratuit</div>
@@ -632,28 +633,39 @@ function getModeScreen(mode) {
               </div>
               <div class="plan-current">Actuel</div>
             </div>
-            <div class="plan-card premium">
-              <div class="plan-badge">POPULAIRE</div>
-              <div class="plan-name">Premium</div>
-              <div class="plan-price">9.99€/an</div>
+            <div class="plan-card professional">
+              <div class="plan-name">Professional</div>
+              <div class="plan-price">39.99€/an</div>
               <div class="plan-features">
                 <div>Nettoyage illimité</div>
                 <div>Analyse avancée</div>
                 <div>Priorité support</div>
                 <div>Sans publicité</div>
               </div>
-              <button class="btn-upgrade" onclick="upgradeToPremium()">Passer à Premium</button>
+              <button class="btn-upgrade" onclick="upgradeToProfessional()">Passer à Professional</button>
             </div>
-            <div class="plan-card pro">
-              <div class="plan-name">Pro</div>
-              <div class="plan-price">19.99€/an</div>
+            <div class="plan-card premium">
+              <div class="plan-badge">POPULAIRE</div>
+              <div class="plan-name">Premium</div>
+              <div class="plan-price">59.99€/an</div>
               <div class="plan-features">
-                <div>Tout Premium</div>
+                <div>Tout Professional</div>
+                <div>3 appareils</div>
                 <div>Export données</div>
-                <div>API access</div>
                 <div>Support dédié</div>
               </div>
-              <button class="btn-upgrade" onclick="upgradeToPro()">Passer à Pro</button>
+              <button class="btn-upgrade" onclick="upgradeToPremium()">Passer à Premium</button>
+            </div>
+            <div class="plan-card pro-plus">
+              <div class="plan-name">Professional Plus</div>
+              <div class="plan-price">79.99€/2 ans</div>
+              <div class="plan-features">
+                <div>Tout Premium</div>
+                <div>3 appareils</div>
+                <div>2 ans de licence</div>
+                <div>Support prioritaire</div>
+              </div>
+              <button class="btn-upgrade" onclick="upgradeToProPlus()">Passer à Professional Plus</button>
             </div>
           </div>
         </div>
@@ -1138,57 +1150,135 @@ window.activatePremium = () => {
 
 // License and Subscription Functions
 function attachLicenseEvents() {
-  setTimeout(() => {
-    const activateBtn = document.getElementById('activateLicenseBtn');
-    if (activateBtn) {
-      activateBtn.onclick = activateLicense;
-    }
-  }, 100);
+  const activateBtn = document.getElementById('activateLicenseBtn');
+  if (activateBtn) {
+    activateBtn.style.background = 'linear-gradient(135deg, #00d4ff, #00aaff)';
+    activateBtn.onclick = activateLicense;
+  }
 }
 
 // Also make it a global function
 function activateLicense() {
-  console.log('=== ACTIVATE LICENSE CLICKED ===');
-  addLog('Activation en cours...', 'info');
   const input = document.getElementById('licenseKeyInput');
-  if (!input) {
-    console.error('licenseKeyInput not found');
-    addLog('Erreur: input non trouvé', 'error');
-    return;
-  }
-  const key = input.value.trim();
+  const btn = document.getElementById('activateLicenseBtn');
+  const key = input?.value.trim();
 
   if (!key) {
     addLog('Veuillez entrer une clé de licence', 'error');
     return;
   }
 
+  // Disable button during verification
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Vérification...';
+  }
+
   addLog('Vérification de la clé: ' + key, 'info');
 
-  window.api.activateLicense(key).then((result) => {
+  const messageEl = document.getElementById('licenseMessage');
+  if (messageEl) {
+    messageEl.textContent = 'Vérification en cours...';
+    messageEl.className = 'license-message info';
+  }
+
+  window.api.verifyLicense(key).then((result) => {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = 'Activer';
+    }
+
     if (result.success) {
-      addLog(`Licence activée avec succès! Tier: ${result.tier}`, 'success');
+      addLog('Système activé! Tier: ' + result.tier, 'success');
       updateSubscriptionUI(result.tier, result.expireDate);
+      if (messageEl) {
+        messageEl.textContent = 'Système activé! Tier: ' + result.tier;
+        messageEl.className = 'license-message success';
+      }
     } else {
-      addLog(`Erreur: ${result.error}`, 'error');
+      addLog(result.error || 'Clé de licence invalide', 'error');
+      if (messageEl) {
+        messageEl.textContent = result.error || 'Clé de licence inexistante';
+        messageEl.className = 'license-message error';
+      }
     }
   }).catch((e) => {
-    addLog('Erreur lors de l\'activation: ' + e.message, 'error');
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = 'Activer';
+    }
+    addLog('Erreur: ' + e.message, 'error');
+    if (messageEl) {
+      messageEl.textContent = 'Erreur: ' + e.message;
+      messageEl.className = 'license-message error';
+    }
   });
 }
 
 // Expose globally
 window.activateLicense = activateLicense;
 
+window.upgradeToProfessional = () => {
+  addLog('Ouverture de la page Professional...', 'info');
+  window.open('https://glockcleaner.com/professional', '_blank');
+};
+
 window.upgradeToPremium = () => {
   addLog('Ouverture de la page Premium...', 'info');
   window.open('https://glockcleaner.com/premium', '_blank');
 };
 
-window.upgradeToPro = () => {
-  addLog('Ouverture de la page Pro...', 'info');
-  window.open('https://glockcleaner.com/pro', '_blank');
+window.upgradeToProPlus = () => {
+  addLog('Ouverture de la page Professional Plus...', 'info');
+  window.open('https://glockcleaner.com/professional-plus', '_blank');
 };
+
+// Supabase Auth Functions
+window.signup = async (email, password, fullName) => {
+  const result = await window.api.signup(email, password, fullName);
+  if (result.success) {
+    addLog('Compte créé avec succès!', 'success');
+    await loadSubscriptionStatus();
+  } else {
+    addLog(`Erreur inscription: ${result.error}`, 'error');
+  }
+  return result;
+};
+
+window.login = async (email, password) => {
+  const result = await window.api.login(email, password);
+  if (result.success) {
+    addLog('Connexion réussie!', 'success');
+    await loadSubscriptionStatus();
+  } else {
+    addLog(`Erreur connexion: ${result.error}`, 'error');
+  }
+  return result;
+};
+
+window.logout = async () => {
+  const result = await window.api.logout();
+  if (result.success) {
+    addLog('Déconnexion réussie!', 'success');
+    updateUserProfileUI(null);
+  } else {
+    addLog(`Erreur déconnexion: ${result.error}`, 'error');
+  }
+  return result;
+};
+
+function updateUserProfileUI(profile) {
+  const userNameEl = document.getElementById('userName');
+  const userEmailEl = document.getElementById('userEmail');
+
+  if (profile) {
+    if (userNameEl) userNameEl.textContent = profile.full_name || 'Utilisateur';
+    if (userEmailEl) userEmailEl.textContent = profile.email || '';
+  } else {
+    if (userNameEl) userNameEl.textContent = 'Connexion';
+    if (userEmailEl) userEmailEl.textContent = 'Cliquez pour vous connecter';
+  }
+}
 
 function updateSubscriptionUI(tier, expireDate) {
   const statusEl = document.getElementById('subStatusValue');
@@ -1214,8 +1304,19 @@ function updateSubscriptionUI(tier, expireDate) {
 
 async function loadSubscriptionStatus() {
   try {
+    // Load subscription (local license)
     const sub = await window.api.getSubscription();
     updateSubscriptionUI(sub.tier, sub.expireDate);
+
+    // Load Supabase session
+    const { session } = await window.api.getSession();
+    if (session?.user) {
+      // Load profile
+      const { profile } = await window.api.getProfile();
+      if (profile) {
+        updateUserProfileUI(profile);
+      }
+    }
   } catch (e) {
     console.error('Erreur chargement abonnement:', e);
   }

@@ -4,6 +4,7 @@ const os = require('os');
 const fs = require('fs-extra');
 const config = require('./config.js'); // ✅ INTÉGRATION CONFIG
 const { execSync } = require('child_process');
+const { supabase, supabaseAdmin } = require('./supabase.js');
 
 // Auto updater - loaded lazily to fix Node.js v24 compatibility
 let autoUpdater = null;
@@ -435,5 +436,148 @@ ipcMain.handle('get-subscription', async () => {
     expireDate: license.expireDate,
     key: license.key
   };
+});
+
+// ==================== Supabase Auth & Licences ====================
+
+// Inscription utilisateur
+ipcMain.handle('signup', async (event, { email, password, fullName }) => {
+  try {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { full_name: fullName }
+      }
+    });
+
+    if (error) throw error;
+
+    return {
+      success: true,
+      user: data.user,
+      session: data.session
+    };
+  } catch (e) {
+    return { success: false, error: e.message };
+  }
+});
+
+// Connexion utilisateur
+ipcMain.handle('login', async (event, { email, password }) => {
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if (error) throw error;
+
+    return {
+      success: true,
+      user: data.user,
+      session: data.session
+    };
+  } catch (e) {
+    return { success: false, error: e.message };
+  }
+});
+
+// Déconnexion
+ipcMain.handle('logout', async () => {
+  try {
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
+    return { success: true };
+  } catch (e) {
+    return { success: false, error: e.message };
+  }
+});
+
+// Obtenir la session actuelle
+ipcMain.handle('get-session', async () => {
+  try {
+    const { data: { session }, error } = await supabase.auth.getSession();
+    if (error) throw error;
+    return { session };
+  } catch (e) {
+    return { session: null };
+  }
+});
+
+// Vérifier licence via Supabase
+ipcMain.handle('verify-license', async (event, licenseKey) => {
+  try {
+    // Vérifier dans Supabase - table licenses (maybeSingle вместо single pour éviter erreur sur 0 ligne)
+    const { data: license, error } = await supabaseAdmin
+      .from('licenses')
+      .select('*')
+      .eq('license_key', licenseKey.toUpperCase())
+      .eq('status', 'active')
+      .maybeSingle();
+
+    // Licence trouvée - pas d'erreur et license n'est pas null
+    if (!error && license) {
+      // Licence valide dans Supabase - active par défaut premium
+      const tier = 'premium';
+      const expireDate = null; // Pas d'expiration dans la table
+      const licenseData = { tier, key: licenseKey.toUpperCase(), expireDate };
+      saveLicense(licenseData);
+      console.log('[License] Clé validée via Supabase:', licenseKey);
+      return { success: true, tier, expireDate };
+    }
+
+    // Clé non trouvée ou erreur - treat no data as "not found"
+    console.log('[License] Clé non trouvée:', licenseKey, error?.message || 'no match');
+    return { success: false, error: 'Clé de licence inexistante dans la base de données' };
+  } catch (e) {
+    console.log('[License] Erreur:', e.message);
+    return { success: false, error: e.message };
+  }
+});
+
+// Mettre à jour le profil utilisateur
+ipcMain.handle('update-profile', async (event, { fullName, phone }) => {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.user) {
+      return { success: false, error: 'Non connecté' };
+    }
+
+    const { data, error } = await supabase
+      .from('profiles')
+      .update({ full_name: fullName, phone, updated_at: new Date().toISOString() })
+      .eq('id', session.user.id)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return { success: true, profile: data };
+  } catch (e) {
+    return { success: false, error: e.message };
+  }
+});
+
+// Obtenir le profil utilisateur
+ipcMain.handle('get-profile', async () => {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.user) {
+      return { profile: null };
+    }
+
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', session.user.id)
+      .single();
+
+    if (error) throw error;
+
+    return { profile: data };
+  } catch (e) {
+    return { profile: null };
+  }
 });
 

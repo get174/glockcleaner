@@ -43,5 +43,14 @@ contextBridge.exposeInMainWorld('api', {
   activateLicense: (key) => ipcRenderer.invoke('activate-license', key),
   getSubscription: () => ipcRenderer.invoke('get-subscription'),
   checkLicenseFormat: (key) => ipcRenderer.invoke('check-license-format', key),
+
+  // Supabase Auth
+  signup: (email, password, fullName) => ipcRenderer.invoke('signup', { email, password, fullName }),
+  login: (email, password) => ipcRenderer.invoke('login', { email, password }),
+  logout: () => ipcRenderer.invoke('logout'),
+  getSession: () => ipcRenderer.invoke('get-session'),
+  verifyLicense: (key) => ipcRenderer.invoke('verify-license', key),
+  updateProfile: (fullName, phone) => ipcRenderer.invoke('update-profile', { fullName, phone }),
+  getProfile: () => ipcRenderer.invoke('get-profile'),
 });
 
